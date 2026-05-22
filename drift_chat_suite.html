@@ -24,8 +24,10 @@
 
             /* Domain Accent (Default: Cyber Teal) */
             --accent-primary: #22d3ee;
+            --accent-primary-rgb: 34, 211, 238;
             --accent-secondary: #10b981;
             --accent-tertiary: #818cf8;
+            --accent-tertiary-rgb: 129, 140, 248;
             --accent-warning: #f472b6;
 
             /* Glassmorphism */
@@ -141,6 +143,52 @@
             font-size: 11px;
             color: var(--ink-secondary);
             font-weight: 500;
+        }
+
+        .setting-label.toggle-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            cursor: pointer;
+            gap: 12px;
+        }
+
+        .drift-toggle {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 38px;
+            height: 20px;
+            border-radius: 999px;
+            border: 1px solid rgba(34, 211, 238, 0.22);
+            background: rgba(255, 255, 255, 0.06);
+            position: relative;
+            cursor: pointer;
+            transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+            flex: 0 0 auto;
+        }
+
+        .drift-toggle::before {
+            content: "";
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--ink-muted);
+            transition: transform 0.15s, background 0.15s;
+        }
+
+        .drift-toggle:checked {
+            background: rgba(34, 211, 238, 0.18);
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 10px rgba(34, 211, 238, 0.16);
+        }
+
+        .drift-toggle:checked::before {
+            transform: translateX(18px);
+            background: var(--accent-primary);
         }
 
         .setting-input {
@@ -493,6 +541,175 @@
             color: var(--ink-muted);
         }
 
+        .activity-indicator {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: fit-content;
+            max-width: 75%;
+            align-self: flex-start;
+            margin-bottom: 28px;
+            padding: 14px 18px;
+            border: 1px solid var(--border-panel);
+            border-left: 3px solid var(--accent-primary);
+            border-radius: 10px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            animation: thinkFadeIn 0.25s ease-out;
+        }
+
+        .activity-indicator[data-model="B"] {
+            border-left-color: var(--accent-tertiary);
+        }
+
+        .ai-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            gap: 12px;
+        }
+
+        .ai-avatar {
+            width: 34px;
+            height: 34px;
+            border: 1px solid var(--accent-primary);
+            border-radius: 4px;
+            background: var(--panel);
+            color: var(--accent-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 700;
+            flex: 0 0 auto;
+        }
+
+        .activity-indicator[data-model="B"] .ai-avatar {
+            border-color: var(--accent-tertiary);
+            color: var(--accent-tertiary);
+        }
+
+        .ai-label {
+            flex: 1;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--accent-primary);
+            white-space: nowrap;
+        }
+
+        .activity-indicator[data-model="B"] .ai-label {
+            color: var(--accent-tertiary);
+        }
+
+        .activity-indicator[data-paused="true"] .ai-label::after {
+            content: " (paused)";
+            color: var(--accent-warning);
+        }
+
+        .ai-elapsed {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--ink-muted);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .ai-dots {
+            display: flex;
+            gap: 6px;
+            padding: 12px 16px;
+            border: 1px solid var(--border-panel);
+            border-left: 3px solid var(--accent-primary);
+            border-radius: 8px;
+            background: var(--panel);
+        }
+
+        .activity-indicator[data-model="B"] .ai-dots {
+            border-left-color: var(--accent-tertiary);
+        }
+
+        .ai-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            animation: thinkBounce 1.4s ease-in-out infinite;
+        }
+
+        .activity-indicator[data-model="B"] .ai-dot {
+            background: var(--accent-tertiary);
+        }
+
+        .ai-dot-2 {
+            animation-delay: 0.2s;
+        }
+
+        .ai-dot-3 {
+            animation-delay: 0.4s;
+        }
+
+        .ai-stats {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--ink-muted);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .ai-stat {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .ai-stat-value {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        .ai-stat-value.ai-input {
+            color: var(--accent-primary);
+        }
+
+        .ai-stat-value.ai-output {
+            color: var(--accent-tertiary);
+        }
+
+        .ai-stat-value.ai-latency {
+            color: var(--ink-secondary);
+        }
+
+        .ai-stat-value.flash {
+            animation: tokenFlash 0.4s ease-out;
+        }
+
+        .ai-stat-divider {
+            width: 1px;
+            height: 12px;
+            background: var(--border-panel);
+        }
+
+        @keyframes thinkBounce {
+            0%, 80%, 100% { transform: scale(1); opacity: 0.35; }
+            40% { transform: scale(1.3); opacity: 1; }
+        }
+
+        @keyframes thinkFadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes tokenFlash {
+            0% { color: var(--accent-warning); }
+            100% { color: var(--ink); }
+        }
+
         /* Collapsible Thinking Block */
         .thinking-container {
             margin-bottom: 12px;
@@ -629,6 +846,104 @@
 
         .control-status {
             color: var(--ink-secondary);
+        }
+
+        .handoff-bar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+        }
+
+        .handoff-track {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .handoff-speaker {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 10px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.03);
+            transition: border-color 0.3s, box-shadow 0.3s, opacity 0.3s;
+        }
+
+        .handoff-speaker[data-side="A"] {
+            --handoff-accent: var(--accent-primary);
+            --handoff-accent-rgb: var(--accent-primary-rgb);
+        }
+
+        .handoff-speaker[data-side="B"] {
+            --handoff-accent: var(--accent-tertiary);
+            --handoff-accent-rgb: var(--accent-tertiary-rgb);
+        }
+
+        .handoff-speaker.active-speaker {
+            border-color: var(--handoff-accent);
+            box-shadow: 0 0 12px rgba(var(--handoff-accent-rgb), 0.24);
+        }
+
+        .handoff-speaker.inactive {
+            opacity: 0.4;
+        }
+
+        .handoff-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--handoff-accent);
+            transition: box-shadow 0.3s;
+        }
+
+        .active-speaker .handoff-dot {
+            animation: handoffPulse 1.2s ease-in-out infinite;
+        }
+
+        .handoff-arrow {
+            color: var(--ink-muted);
+            opacity: 0.6;
+            transition: color 0.4s ease, opacity 0.4s ease, filter 0.4s ease;
+            line-height: 0;
+        }
+
+        .handoff-arrow[data-active="A"] {
+            color: var(--accent-primary);
+        }
+
+        .handoff-arrow[data-active="B"] {
+            color: var(--accent-tertiary);
+        }
+
+        .handoff-arrow.active {
+            opacity: 1;
+            filter: drop-shadow(0 0 6px currentColor);
+        }
+
+        .handoff-timer {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding-left: 16px;
+            border-left: 1px solid var(--border-panel);
+            color: var(--ink-muted);
+        }
+
+        .handoff-timer-value {
+            min-width: 3ch;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--ink);
+            font-variant-numeric: tabular-nums;
+        }
+
+        @keyframes handoffPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(var(--handoff-accent-rgb), 0.4); }
+            50% { box-shadow: 0 0 0 6px rgba(var(--handoff-accent-rgb), 0); }
         }
 
         .control-right input[type="number"] {
@@ -888,6 +1203,15 @@
                 justify-content: center;
                 flex-wrap: wrap;
             }
+
+            .handoff-bar {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .activity-indicator {
+                max-width: 100%;
+            }
         }
 
         .terminal-close {
@@ -968,6 +1292,10 @@
                 </div>
                 <div class="setting-group" style="margin-top: 12px;">
                     <button class="drift-btn drift-btn-warning" id="clearContextBtn" style="width:100%; padding:8px; font-size:11px;">🗑 Clear Both Histories</button>
+                </div>
+                <div class="compact-row" style="margin-top: -8px;">
+                    <button class="drift-btn drift-btn-secondary" id="exportMdBtn" style="width:100%; padding:8px; font-size:11px;" disabled>Export MD</button>
+                    <button class="drift-btn drift-btn-secondary" id="exportJsonBtn" style="width:100%; padding:8px; font-size:11px;" disabled>Export JSON</button>
                 </div>
             </div>
 
@@ -1069,6 +1397,27 @@
                 <div class="control-left">
                     <span class="turn-counter">Turn <strong id="turnCount">0</strong>/<span id="turnLimit">10</span></span>
                     <span class="control-status" id="loopStatus">Idle</span>
+                    <div class="handoff-bar" id="handoffBar" style="display:none;">
+                        <div class="handoff-track">
+                            <div class="handoff-speaker" data-side="A">
+                                <span class="handoff-label">Model A</span>
+                                <div class="handoff-dot"></div>
+                            </div>
+                            <div class="handoff-arrow" id="handoffArrow">
+                                <svg viewBox="0 0 24 12" width="40" height="12" aria-hidden="true">
+                                    <path d="M0,6 H18 M12,1 L18,6 L12,11" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                                </svg>
+                            </div>
+                            <div class="handoff-speaker" data-side="B">
+                                <span class="handoff-label">Model B</span>
+                                <div class="handoff-dot"></div>
+                            </div>
+                        </div>
+                        <div class="handoff-timer">
+                            <span class="handoff-timer-label">next in</span>
+                            <span class="handoff-timer-value" id="handoffTimerValue">1.0s</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="control-center">
                     <button id="btnStart" class="drift-btn drift-btn-primary">&#9654; Start Loop</button>
@@ -1147,7 +1496,10 @@
         };
 
         const OPENCODE_GO_UPSTREAM_BASE_URL = "https://opencode.ai/zen/go/v1";
-        const OPENCODE_GO_PROXY_BASE_URL = "http://127.0.0.1:8787/opencode-go/v1";
+        const RELAY_BASE = (typeof window === 'undefined' || window.location.protocol === 'file:' || window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost')
+            ? 'http://127.0.0.1:8787'
+            : 'https://drift-api.agentflow.com';
+        const OPENCODE_GO_PROXY_BASE_URL = `${RELAY_BASE}/opencode-go/v1`;
 
         const PROVIDER_BASE_URLS = {
             "opencode-go": OPENCODE_GO_PROXY_BASE_URL,
@@ -1157,8 +1509,8 @@
 
         // State variables
         const modelState = {
-            A: { provider: 'simulate', model: 'deepseek-v4-flash', systemPrompt: '', key: '', baseUrl: 'http://localhost:1234/v1' },
-            B: { provider: 'simulate', model: 'qwen-35b-coder', systemPrompt: '', key: '', baseUrl: 'http://localhost:1234/v1' }
+            A: { provider: 'simulate', model: 'deepseek-v4-flash', systemPrompt: '', key: '', baseUrl: 'http://localhost:1234/v1', showReasoning: true },
+            B: { provider: 'simulate', model: 'qwen-35b-coder', systemPrompt: '', key: '', baseUrl: 'http://localhost:1234/v1', showReasoning: true }
         };
 
         let loopState = { running: false, paused: false, turn: 0, maxTurns: 10, turnDelay: 1000, lastSpeaker: null, stopReason: 'Idle' };
@@ -1171,6 +1523,9 @@
         let costCap = 0.25;
         let resumeResolvers = [];
         let lastRetry = null;
+        let handoffCountdownTimer = null;
+        let handoffBurstTimer = null;
+        const activityTimers = {};
 
         const tokenUsage = {
             A: { prompt: 0, completion: 0, cost: 0 },
@@ -1208,6 +1563,9 @@
         const turnCount = document.getElementById('turnCount');
         const turnLimit = document.getElementById('turnLimit');
         const loopStatus = document.getElementById('loopStatus');
+        const handoffBar = document.getElementById('handoffBar');
+        const handoffTimerValue = document.getElementById('handoffTimerValue');
+        const handoffArrow = document.getElementById('handoffArrow');
         const btnStart = document.getElementById('btnStart');
         const btnPause = document.getElementById('btnPause');
         const btnStop = document.getElementById('btnStop');
@@ -1218,6 +1576,8 @@
         const sidebarDelaySlider = document.getElementById('sidebarDelaySlider');
         const delayValue = document.getElementById('delayValue');
         const costCapInput = document.getElementById('costCapInput');
+        const exportMdBtn = document.getElementById('exportMdBtn');
+        const exportJsonBtn = document.getElementById('exportJsonBtn');
 
         function loadSavedConfig() {
             ['A', 'B'].forEach(id => {
@@ -1229,6 +1589,7 @@
                 const keyMode = modelState[id].provider;
                 modelState[id].baseUrl = loadBaseUrlForModel(id, keyMode);
                 modelState[id].key = localStorage.getItem(`drift_key_${id}_${keyMode}`) || localStorage.getItem(`drift_key_${keyMode}`) || STATIC_KEYS[keyMode] || '';
+                modelState[id].showReasoning = localStorage.getItem(`drift_show_reasoning_${id}`) !== 'false';
                 if (!PROVIDER_MODELS[modelState[id].provider]?.includes(modelState[id].model)) {
                     modelState[id].model = PROVIDER_MODELS[modelState[id].provider]?.[0] || fallbackModel;
                 }
@@ -1253,6 +1614,7 @@
             updateLoopUI();
             updateFooterTarget();
             renderTerminal();
+            updateExportButtons();
         }
 
         function saveConfig() {
@@ -1268,6 +1630,7 @@
                     }
                 }
                 localStorage.setItem(`drift_key_${id}_${state.provider}`, state.key || '');
+                localStorage.setItem(`drift_show_reasoning_${id}`, state.showReasoning ? 'true' : 'false');
             });
             localStorage.setItem('drift_mode', modelState.A.provider);
             if (modelState.A.provider === 'lmstudio') {
@@ -1319,6 +1682,12 @@
                         ${models.map(m => `<option value="${escapeAttr(m)}"${m === state.model ? ' selected' : ''}>${escapeHtml(m)}</option>`).join('')}
                     </select>
                 </div>
+                <div class="setting-group" style="margin-top: -4px;">
+                    <label class="setting-label toggle-label" for="showReasoningToggle">
+                        <span>Show Reasoning</span>
+                        <input type="checkbox" id="showReasoningToggle" class="drift-toggle"${state.showReasoning ? ' checked' : ''}>
+                    </label>
+                </div>
                 <div class="setting-group">
                     <label class="setting-label">System Prompt</label>
                     <textarea class="setting-input" id="systemPromptInput" rows="4" placeholder="Enter custom system prompt for this model...">${escapeHtml(state.systemPrompt || '')}</textarea>
@@ -1330,6 +1699,7 @@
             const apiKeyInput = document.getElementById('apiKeyInput');
             const baseUrlInput = document.getElementById('baseUrlInput');
             const systemPromptInput = document.getElementById('systemPromptInput');
+            const showReasoningToggle = document.getElementById('showReasoningToggle');
             modeSelect.value = state.provider;
             modeSelect.addEventListener('change', () => {
                 state.provider = modeSelect.value;
@@ -1343,6 +1713,7 @@
             modelSelect.addEventListener('change', () => { state.model = modelSelect.value; updateFooterTarget(); saveConfig(); });
             apiKeyInput?.addEventListener('input', () => { state.key = apiKeyInput.value; saveConfig(); });
             baseUrlInput?.addEventListener('input', () => { state.baseUrl = baseUrlInput.value; saveConfig(); });
+            showReasoningToggle.addEventListener('change', () => { state.showReasoning = showReasoningToggle.checked; saveConfig(); });
             systemPromptInput.addEventListener('input', () => { state.systemPrompt = systemPromptInput.value; saveConfig(); });
             updateStatusForActiveModel();
         }
@@ -1404,6 +1775,167 @@
             footerTarget.innerText = `A: ${a.model} (${a.provider}) / B: ${b.model} (${b.provider})`;
         }
 
+        function recordChatMessage(source, text, thinkingText = '', usage = {}) {
+            chatHistory.push({
+                source,
+                text,
+                thinkingText: thinkingText || '',
+                tokens: {
+                    prompt: usage.promptTokens || 0,
+                    completion: usage.completionTokens || 0
+                },
+                timestamp: Date.now()
+            });
+            updateExportButtons();
+        }
+
+        function getModelPromptTokens(modelId) {
+            const systemPrompt = buildSystemPrompt(modelId);
+            const messages = [{ role: 'system', content: systemPrompt }, ...conversationHistory[modelId]];
+            return estimateTokens(messages.map(m => m.content).join(' '));
+        }
+
+        function paintFence() {
+            return new Promise(resolve => requestAnimationFrame(resolve));
+        }
+
+        function clearActivityTimer(ts) {
+            if (activityTimers[ts]) {
+                clearInterval(activityTimers[ts]);
+                delete activityTimers[ts];
+            }
+        }
+
+        function removeActivityIndicator(ts) {
+            clearActivityTimer(ts);
+            const indicator = document.getElementById(`ai-${ts}`);
+            if (indicator) indicator.remove();
+        }
+
+        function removeAllActivityIndicators() {
+            Object.keys(activityTimers).forEach(clearActivityTimer);
+            chatArea.querySelectorAll('.activity-indicator').forEach(indicator => indicator.remove());
+        }
+
+        function createActivityIndicator(modelId, promptTokens, startTime) {
+            removeAllActivityIndicators();
+            const ts = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+            const indicator = document.createElement('div');
+            indicator.className = 'activity-indicator';
+            indicator.dataset.model = modelId;
+            indicator.dataset.paused = loopState.paused ? 'true' : 'false';
+            indicator.id = `ai-${ts}`;
+            indicator.innerHTML = `
+                <div class="ai-header">
+                    <div class="ai-avatar">${modelId}</div>
+                    <span class="ai-label">Model ${modelId} generating...</span>
+                    <span class="ai-elapsed">0.0s</span>
+                </div>
+                <div class="ai-dots">
+                    <span class="ai-dot ai-dot-1"></span>
+                    <span class="ai-dot ai-dot-2"></span>
+                    <span class="ai-dot ai-dot-3"></span>
+                </div>
+                <div class="ai-stats">
+                    <span class="ai-stat">IN <span class="ai-stat-value ai-input" id="ai-input-${ts}">${promptTokens}</span></span>
+                    <span class="ai-stat-divider"></span>
+                    <span class="ai-stat">OUT <span class="ai-stat-value ai-output" id="ai-output-${ts}">--</span></span>
+                    <span class="ai-stat-divider"></span>
+                    <span class="ai-stat">LAT <span class="ai-stat-value ai-latency" id="ai-latency-${ts}">--</span></span>
+                </div>
+            `;
+            chatArea.appendChild(indicator);
+            chatArea.scrollTop = chatArea.scrollHeight;
+            activityTimers[ts] = setInterval(() => updateActivityElapsed(ts, startTime), 200);
+            return ts;
+        }
+
+        function updateActivityElapsed(ts, startTime) {
+            const indicator = document.getElementById(`ai-${ts}`);
+            if (!indicator) {
+                clearActivityTimer(ts);
+                return;
+            }
+            const elapsed = indicator.querySelector('.ai-elapsed');
+            if (elapsed) elapsed.textContent = `${((Date.now() - startTime) / 1000).toFixed(1)}s`;
+        }
+
+        function completeActivityIndicator(ts, outputTokens, latencyMs) {
+            clearActivityTimer(ts);
+            const output = document.getElementById(`ai-output-${ts}`);
+            const latency = document.getElementById(`ai-latency-${ts}`);
+            if (output) {
+                output.textContent = outputTokens ?? 0;
+                output.classList.add('flash');
+                setTimeout(() => output.classList.remove('flash'), 400);
+            }
+            if (latency) latency.textContent = `${(latencyMs / 1000).toFixed(1)}s`;
+        }
+
+        function updateActivityPauseState() {
+            chatArea.querySelectorAll('.activity-indicator').forEach(indicator => {
+                indicator.dataset.paused = loopState.paused ? 'true' : 'false';
+            });
+        }
+
+        function clearHandoffCountdown() {
+            if (handoffCountdownTimer) {
+                clearInterval(handoffCountdownTimer);
+                handoffCountdownTimer = null;
+            }
+        }
+
+        function startHandoffCountdown(totalMs = loopState.turnDelay) {
+            clearHandoffCountdown();
+            const startedAt = Date.now();
+            const update = () => {
+                const remaining = Math.max(0, totalMs - (Date.now() - startedAt));
+                if (handoffTimerValue) handoffTimerValue.textContent = `${(remaining / 1000).toFixed(1)}s`;
+                if (remaining <= 0) clearHandoffCountdown();
+            };
+            update();
+            handoffCountdownTimer = setInterval(update, 100);
+        }
+
+        async function waitTurnDelay(totalMs) {
+            startHandoffCountdown(totalMs);
+            const startedAt = Date.now();
+            while (loopState.running && Date.now() - startedAt < totalMs) {
+                if (loopState.paused) {
+                    clearHandoffCountdown();
+                    await waitForResume();
+                    if (!loopState.running) break;
+                    return waitTurnDelay(totalMs);
+                }
+                await delay(Math.min(100, totalMs - (Date.now() - startedAt)));
+            }
+            clearHandoffCountdown();
+        }
+
+        function triggerHandoffBurst() {
+            if (!handoffArrow) return;
+            handoffArrow.classList.add('active');
+            clearTimeout(handoffBurstTimer);
+            handoffBurstTimer = setTimeout(() => handoffArrow.classList.remove('active'), 800);
+        }
+
+        function updateHandoffUI() {
+            if (!handoffBar || !handoffArrow) return;
+            handoffBar.style.display = loopState.running ? 'flex' : 'none';
+            loopStatus.style.display = loopState.running ? 'none' : '';
+            if (!loopState.running) {
+                clearHandoffCountdown();
+                if (handoffTimerValue) handoffTimerValue.textContent = `${(loopState.turnDelay / 1000).toFixed(1)}s`;
+            }
+            const activeSide = loopState.lastSpeaker || 'A';
+            handoffBar.querySelectorAll('.handoff-speaker').forEach(speaker => {
+                const isActive = speaker.dataset.side === activeSide;
+                speaker.classList.toggle('active-speaker', isActive);
+                speaker.classList.toggle('inactive', !isActive);
+            });
+            handoffArrow.dataset.active = activeSide;
+        }
+
         function appendMessage(source, text, thinkingText = '', usage = {}) {
             const normalized = source === 'assistant' ? 'A' : source;
             const row = document.createElement('div');
@@ -1423,7 +1955,8 @@
             const bubble = document.createElement('div');
             bubble.className = 'bubble-body';
 
-            if (normalized !== 'user' && thinkingText) {
+            const shouldShowThinking = normalized !== 'user' && modelState[normalized]?.showReasoning && String(thinkingText || '').trim();
+            if (shouldShowThinking) {
                 const thinkContainer = document.createElement('div');
                 thinkContainer.className = 'thinking-container collapsed';
                 const thinkHeader = document.createElement('div');
@@ -1458,6 +1991,7 @@
             row.appendChild(wrapper);
             chatArea.appendChild(row);
             chatArea.scrollTop = chatArea.scrollHeight;
+            updateExportButtons();
         }
 
         async function handleSend() {
@@ -1472,7 +2006,9 @@
             }
 
             const target = document.querySelector('input[name="target"]:checked')?.value || 'A';
-            appendMessage('user', query, '', { promptTokens: estimateTokens(query), completionTokens: 0 });
+            const userUsage = { promptTokens: estimateTokens(query), completionTokens: 0 };
+            appendMessage('user', query, '', userUsage);
+            recordChatMessage('user', query, '', userUsage);
             addGlobalLog('manual-injection', { target, text: query });
 
             if (target === 'both') {
@@ -1492,16 +2028,26 @@
             const content = withContext(query);
             conversationHistory[modelId].push({ role: 'user', content });
             truncateHistory(modelId);
+            const start = Date.now();
+            const promptTokens = getModelPromptTokens(modelId);
+            let aiTs = null;
             try {
                 lastRetry = { type: 'manual', modelId, query };
                 btnRetry.disabled = true;
+                aiTs = createActivityIndicator(modelId, promptTokens, start);
+                await paintFence();
                 const result = await callModel(modelId);
+                completeActivityIndicator(aiTs, result.usage.completionTokens, Date.now() - start);
+                const visibleFor = Date.now() - start;
+                if (visibleFor < 300) await delay(300 - visibleFor);
                 conversationHistory[modelId].push({ role: 'assistant', content: result.text });
-                chatHistory.push({ source: modelId, text: result.text, timestamp: Date.now() });
+                recordChatMessage(modelId, result.text, result.thoughts, result.usage);
+                removeActivityIndicator(aiTs);
                 appendMessage(modelId, result.text, result.thoughts, result.usage);
                 lastRetry = null;
                 updateStats();
             } catch (e) {
+                if (aiTs) removeActivityIndicator(aiTs);
                 handleModelError(modelId, e);
             }
         }
@@ -1516,11 +2062,15 @@
             updateLoopUI();
 
             if (seedPrompt) {
-                appendMessage('user', seedPrompt, '', { promptTokens: estimateTokens(seedPrompt), completionTokens: 0 });
+                const seedUsage = { promptTokens: estimateTokens(seedPrompt), completionTokens: 0 };
+                appendMessage('user', seedPrompt, '', seedUsage);
+                recordChatMessage('user', seedPrompt, '', seedUsage);
                 conversationHistory.A.push({ role: 'user', content: withContext(seedPrompt) });
             } else if (!conversationHistory.A.length) {
                 const defaultSeed = 'Begin an adversarial but constructive technical conversation. Challenge assumptions and respond concisely.';
-                appendMessage('user', defaultSeed, '', { promptTokens: estimateTokens(defaultSeed), completionTokens: 0 });
+                const seedUsage = { promptTokens: estimateTokens(defaultSeed), completionTokens: 0 };
+                appendMessage('user', defaultSeed, '', seedUsage);
+                recordChatMessage('user', defaultSeed, '', seedUsage);
                 conversationHistory.A.push({ role: 'user', content: withContext(defaultSeed) });
             }
 
@@ -1532,18 +2082,33 @@
 
                 const activeId = loopState.lastSpeaker === 'A' ? 'B' : 'A';
                 const otherId = activeId === 'A' ? 'B' : 'A';
+                const start = Date.now();
+                const promptTokens = getModelPromptTokens(activeId);
+                let aiTs = null;
 
                 try {
                     lastRetry = { type: 'loop', modelId: activeId };
                     btnRetry.disabled = true;
+                    loopState.lastSpeaker = activeId;
+                    updateLoopUI();
+                    triggerHandoffBurst();
+                    aiTs = createActivityIndicator(activeId, promptTokens, start);
+                    await paintFence();
                     const result = await callModel(activeId);
+                    if (!loopState.running) {
+                        removeActivityIndicator(aiTs);
+                        break;
+                    }
+                    completeActivityIndicator(aiTs, result.usage.completionTokens, Date.now() - start);
+                    const visibleFor = Date.now() - start;
+                    if (visibleFor < 300) await delay(300 - visibleFor);
                     conversationHistory[activeId].push({ role: 'assistant', content: result.text });
                     conversationHistory[otherId].push({ role: 'user', content: result.text });
                     truncateHistory(activeId);
                     truncateHistory(otherId);
+                    removeActivityIndicator(aiTs);
                     appendMessage(activeId, result.text, result.thoughts, result.usage);
-                    chatHistory.push({ source: activeId, text: result.text, timestamp: Date.now() });
-                    loopState.lastSpeaker = activeId;
+                    recordChatMessage(activeId, result.text, result.thoughts, result.usage);
                     loopState.turn++;
                     addGlobalLog('turn', { speaker: activeId, text: result.text.slice(0, 240) });
                     lastRetry = null;
@@ -1551,6 +2116,8 @@
                     updateLoopUI();
                     if (checkCostCap()) break;
                 } catch (e) {
+                    if (aiTs) removeActivityIndicator(aiTs);
+                    clearHandoffCountdown();
                     handleModelError(activeId, e);
                     loopState.running = false;
                     loopState.stopReason = `Error: ${e.message}`;
@@ -1558,7 +2125,7 @@
                 }
 
                 if (loopState.running && loopState.turn < loopState.maxTurns) {
-                    await delay(loopState.turnDelay);
+                    await waitTurnDelay(loopState.turnDelay);
                 }
             }
 
@@ -1675,19 +2242,35 @@
             if (provider === 'gemini') {
                 const candidate = payload.candidates?.[0];
                 const part = candidate?.content?.parts?.[0] || {};
+                const extracted = extractThinkTags(part.text || 'No response text', part.thoughtSignature || '');
                 return {
-                    reply: part.text || 'No response text',
-                    thoughts: part.thoughtSignature || '',
+                    reply: extracted.text,
+                    thoughts: extracted.thinking,
                     promptTokens: payload.usageMetadata?.promptTokenCount,
                     completionTokens: payload.usageMetadata?.candidatesTokenCount
                 };
             }
+            const choice = payload.choices?.[0] || {};
+            const message = choice.message || {};
+            const explicitReasoning = message.reasoning_content || choice.reasoning_content || message.reasoning || choice.reasoning || '';
+            const extracted = extractThinkTags(message.content || 'No choices text', explicitReasoning);
             return {
-                reply: payload.choices?.[0]?.message?.content || 'No choices text',
-                thoughts: '',
+                reply: extracted.text,
+                thoughts: extracted.thinking,
                 promptTokens: payload.usage?.prompt_tokens,
                 completionTokens: payload.usage?.completion_tokens
             };
+        }
+
+        function extractThinkTags(content, existingThinking = '') {
+            let text = String(content || '');
+            const thinkingChunks = [];
+            text = text.replace(/<think\b[^>]*>([\s\S]*?)<\/think>/gi, (_match, inner) => {
+                if (inner && inner.trim()) thinkingChunks.push(inner.trim());
+                return '';
+            }).trim();
+            const thinking = [existingThinking, ...thinkingChunks].filter(item => String(item || '').trim()).join('\n\n').trim();
+            return { text: text || 'No response text', thinking };
         }
 
         function buildSystemPrompt(modelId) {
@@ -1752,7 +2335,7 @@
         function renderGlobalLog() {
             const combinedPrompt = tokenUsage.A.prompt + tokenUsage.B.prompt;
             const combinedCompletion = tokenUsage.A.completion + tokenUsage.B.completion;
-            const turns = chatHistory.slice(-20).map(item => `[${formatTime(item.timestamp)}] Model ${item.source}: ${escapeHtml(item.text.slice(0, 160))}`).join('\n');
+            const turns = chatHistory.slice(-20).map(item => `[${formatTime(item.timestamp)}] ${formatSourceName(item.source)}: ${escapeHtml(item.text.slice(0, 160))}`).join('\n');
             const globals = debugLogs.global.slice(-12).map(item => `[${formatTime(item.timestamp)}] ${item.title}: ${escapeHtml(JSON.stringify(item.payload || item, null, 2).slice(0, 400))}`).join('\n');
             return `GLOBAL USAGE
 ----------------------------------------
@@ -1781,6 +2364,134 @@ ${globals || 'No global events yet.'}`;
             contextTokenCount = conversationHistory.A.concat(conversationHistory.B).reduce((sum, msg) => sum + estimateTokens(msg.content), 0);
             contextStat.innerText = `${contextTokenCount} tokens`;
             updateFooterTarget();
+            updateExportButtons();
+        }
+
+        function updateExportButtons() {
+            const disabled = chatHistory.length === 0;
+            if (exportMdBtn) exportMdBtn.disabled = disabled;
+            if (exportJsonBtn) exportJsonBtn.disabled = disabled;
+        }
+
+        function buildExportMetadata() {
+            const totalPromptTokens = tokenUsage.A.prompt + tokenUsage.B.prompt;
+            const totalCompletionTokens = tokenUsage.A.completion + tokenUsage.B.completion;
+            return {
+                timestamp: new Date().toISOString(),
+                models: {
+                    A: exportModelConfig('A'),
+                    B: exportModelConfig('B')
+                },
+                personality: {
+                    sarcasm: Number(sarcasmSlider.value),
+                    honesty: Number(honestySlider.value),
+                    humor: Number(humorSlider.value)
+                },
+                totalTokens: {
+                    prompt: totalPromptTokens,
+                    completion: totalCompletionTokens,
+                    combined: totalPromptTokens + totalCompletionTokens
+                },
+                totalCost: Number((tokenUsage.A.cost + tokenUsage.B.cost).toFixed(8)),
+                turnCount: loopState.turn
+            };
+        }
+
+        function exportModelConfig(id) {
+            return {
+                provider: modelState[id].provider,
+                model: modelState[id].model,
+                systemPrompt: modelState[id].systemPrompt || '',
+                showReasoning: Boolean(modelState[id].showReasoning)
+            };
+        }
+
+        function exportMarkdown() {
+            if (!chatHistory.length) return;
+            const metadata = buildExportMetadata();
+            const frontmatter = [
+                '---',
+                `timestamp: ${yamlScalar(metadata.timestamp)}`,
+                'models:',
+                `  A:`,
+                `    provider: ${yamlScalar(metadata.models.A.provider)}`,
+                `    model: ${yamlScalar(metadata.models.A.model)}`,
+                `    systemPrompt: ${yamlBlock(metadata.models.A.systemPrompt, 6)}`,
+                `  B:`,
+                `    provider: ${yamlScalar(metadata.models.B.provider)}`,
+                `    model: ${yamlScalar(metadata.models.B.model)}`,
+                `    systemPrompt: ${yamlBlock(metadata.models.B.systemPrompt, 6)}`,
+                'totalTokens:',
+                `  prompt: ${metadata.totalTokens.prompt}`,
+                `  completion: ${metadata.totalTokens.completion}`,
+                `  combined: ${metadata.totalTokens.combined}`,
+                `totalCost: ${metadata.totalCost}`,
+                `turnCount: ${metadata.turnCount}`,
+                '---'
+            ].join('\n');
+            const body = chatHistory.map(message => {
+                const sourceLabel = formatSourceName(message.source, true);
+                const modelName = modelState[message.source]?.model || 'user';
+                const header = message.source === 'user' ? `> **${sourceLabel}:**` : `> **${sourceLabel} (${modelName}):**`;
+                const content = blockquote(message.text);
+                const thinking = message.thinkingText ? `\n\n> _Reasoning captured: ${message.thinkingText.split(/\s+/).filter(Boolean).length} words_` : '';
+                return `${header}\n${content}${thinking}\n\n_tokens: ${message.tokens.prompt || 0} prompt / ${message.tokens.completion || 0} completion_`;
+            }).join('\n\n');
+            downloadBlob(`${frontmatter}\n\n${body}\n`, 'text/markdown;charset=utf-8', `drift-export-${exportTimestamp()}.md`);
+        }
+
+        function exportJson() {
+            if (!chatHistory.length) return;
+            const data = {
+                metadata: buildExportMetadata(),
+                messages: chatHistory.map(message => ({
+                    source: message.source,
+                    text: message.text,
+                    thinkingText: message.thinkingText || '',
+                    tokens: message.tokens,
+                    timestamp: new Date(message.timestamp).toISOString()
+                }))
+            };
+            downloadBlob(`${JSON.stringify(data, null, 2)}\n`, 'application/json;charset=utf-8', `drift-export-${exportTimestamp()}.json`);
+        }
+
+        function downloadBlob(content, type, filename) {
+            const blob = new Blob([content], { type });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(url);
+        }
+
+        function exportTimestamp() {
+            const date = new Date();
+            const pad = value => String(value).padStart(2, '0');
+            return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}-${pad(date.getHours())}${pad(date.getMinutes())}`;
+        }
+
+        function formatSourceName(source, exportLabel = false) {
+            if (source === 'A') return 'Model A';
+            if (source === 'B') return 'Model B';
+            return exportLabel ? 'User' : 'You';
+        }
+
+        function blockquote(text) {
+            return String(text || '').split('\n').map(line => `> ${line}`).join('\n');
+        }
+
+        function yamlScalar(value) {
+            return JSON.stringify(String(value ?? ''));
+        }
+
+        function yamlBlock(value, indent) {
+            const text = String(value || '');
+            if (!text) return '""';
+            const padding = ' '.repeat(indent);
+            return `|\n${text.split('\n').map(line => `${padding}${line}`).join('\n')}`;
         }
 
         function updateLoopUI() {
@@ -1800,6 +2511,9 @@ ${globals || 'No global events yet.'}`;
             delaySlider.value = loopState.turnDelay;
             sidebarDelaySlider.value = loopState.turnDelay;
             delayValue.innerText = `${(loopState.turnDelay / 1000).toFixed(1)}s`;
+            if (loopState.paused) clearHandoffCountdown();
+            updateHandoffUI();
+            updateActivityPauseState();
             saveConfig();
         }
 
@@ -1823,6 +2537,8 @@ ${globals || 'No global events yet.'}`;
                 loopState.turn = 0;
                 loopState.lastSpeaker = null;
             }
+            clearHandoffCountdown();
+            removeAllActivityIndicators();
             resumeResolvers.splice(0).forEach(resolve => resolve());
             updateLoopUI();
         }
@@ -1931,6 +2647,8 @@ ${globals || 'No global events yet.'}`;
         delaySlider.addEventListener('input', () => syncDelay(delaySlider.value));
         sidebarDelaySlider.addEventListener('input', () => syncDelay(sidebarDelaySlider.value));
         costCapInput.addEventListener('input', () => { costCap = Math.max(0, parseFloat(costCapInput.value || '0')); saveConfig(); renderTerminal(); });
+        exportMdBtn?.addEventListener('click', exportMarkdown);
+        exportJsonBtn?.addEventListener('click', exportJson);
 
         btnStart.addEventListener('click', () => {
             if (loopState.running && loopState.paused) {
@@ -1978,6 +2696,7 @@ ${globals || 'No global events yet.'}`;
                 chatArea.innerHTML = '';
                 updateStats();
                 renderTerminal();
+                updateExportButtons();
                 costStat.innerText = '$0.00000';
                 contextStat.innerText = '0 tokens';
                 appendMessage('assistant', 'Context cleared. Both model histories reset.', '', {});

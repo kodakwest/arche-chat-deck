@@ -1,0 +1,6 @@
+name = "drift-api"
+main = "relay-worker.js"
+compatibility_date = "2026-05-15"
+routes = [
+  { pattern = "drift-api.agentflow.com", custom_domain = true }
+]

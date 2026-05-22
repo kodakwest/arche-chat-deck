@@ -37,6 +37,7 @@ function extractFunction(name) {
 
 const extractedSource = [
     extractConst('OPENCODE_GO_UPSTREAM_BASE_URL'),
+    extractConst('RELAY_BASE'),
     extractConst('OPENCODE_GO_PROXY_BASE_URL'),
     extractConst('PROVIDER_BASE_URLS'),
     extractFunction('getProviderDefaultBaseUrl'),

@@ -1,0 +1,10 @@
+name = "agentflow-ai-chat-deck"
+compatibility_date = "2026-05-15"
+pages_build_output_dir = "."
+
+[build]
+command = ""
+
+[[routes]]
+pattern = "app.agentflow.com/drift*"
+custom_domain = true
