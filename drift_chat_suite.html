@@ -1,0 +1,2456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drift AI Chat Suite — Tactical Control Deck</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Marked.js for fast high-fidelity client-side Markdown rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        :root {
+            /* Core Backgrounds */
+            --bg-deep: #08080a;
+            --bg-base: #0c0d0f;
+            --bg-alt: #030712;
+            --panel: #111215;
+            --surface: #17181c;
+            --border-panel: rgba(255, 255, 255, 0.05);
+
+            /* Typography */
+            --ink: #f2f0e8;
+            --ink-secondary: #a8a6a0;
+            --ink-muted: #6b6a66;
+
+            /* Domain Accent (Default: Cyber Teal) */
+            --accent-primary: #22d3ee;
+            --accent-secondary: #10b981;
+            --accent-tertiary: #818cf8;
+            --accent-warning: #f472b6;
+
+            /* Glassmorphism */
+            --glass-bg: rgba(17, 18, 21, 0.7);
+            --glass-border: rgba(34, 211, 238, 0.15);
+            --glass-blur: 16px;
+
+            --font-sans: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--ink);
+            font-family: var(--font-sans);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Ambient scanline and noise effects */
+        .scanlines {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(34, 211, 238, 0.006) 2px,
+                rgba(34, 211, 238, 0.006) 4px
+            );
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* App Layout */
+        .app-container {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* Sidebar Panel */
+        .sidebar {
+            background-color: var(--panel);
+            border-right: 1px solid var(--border-panel);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            height: 100vh;
+            overflow-y: auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Vertical Status Strip decoration */
+        .status-strip {
+            position: absolute;
+            left: 0;
+            top: 100px;
+            bottom: 100px;
+            width: 3px;
+            background: linear-gradient(180deg, transparent, var(--accent-primary), transparent);
+            box-shadow: 0 0 10px var(--accent-primary);
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: var(--font-mono);
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--accent-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .logo-area svg {
+            width: 24px;
+            height: 24px;
+            color: var(--accent-primary);
+            filter: drop-shadow(0 0 4px rgba(34, 211, 238, 0.4));
+        }
+
+        .section-heading {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--ink-muted);
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .setting-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        .setting-label {
+            font-size: 11px;
+            color: var(--ink-secondary);
+            font-weight: 500;
+        }
+
+        .setting-input {
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-panel);
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: var(--ink);
+            font-family: var(--font-mono);
+            font-size: 12px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .setting-input:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 8px rgba(34, 211, 238, 0.15);
+        }
+
+        .setting-select {
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-panel);
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: var(--ink);
+            font-family: var(--font-mono);
+            font-size: 12px;
+            outline: none;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23a8a6a0'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 14px;
+            padding-right: 32px;
+        }
+
+        .setting-select:focus {
+            border-color: var(--accent-primary);
+        }
+
+        textarea.setting-input {
+            resize: vertical;
+            min-height: 92px;
+            line-height: 1.45;
+        }
+
+        .model-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 16px;
+        }
+
+        .tab-pill {
+            flex: 1;
+            padding: 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-panel);
+            color: var(--ink-muted);
+            font-family: var(--font-mono);
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .tab-pill.active-a {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+            background: rgba(34, 211, 238, 0.05);
+        }
+
+        .tab-pill.active-b {
+            border-color: var(--accent-tertiary);
+            color: var(--accent-tertiary);
+            background: rgba(129, 140, 248, 0.05);
+        }
+
+        .compact-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        /* Personality Slider Widgets */
+        .slider-container {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--ink-secondary);
+        }
+
+        .slider-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .drift-slider {
+            flex: 1;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 2px;
+            outline: none;
+        }
+
+        .drift-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            background: var(--accent-primary);
+            cursor: pointer;
+            box-shadow: 0 0 8px var(--accent-primary);
+            transition: transform 0.1s;
+        }
+
+        .drift-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        /* Main Area */
+        .workspace {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: var(--bg-base);
+            position: relative;
+        }
+
+        /* Top HUD HUD-Scoreboard */
+        .hud-header {
+            background-color: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border-bottom: 1px solid var(--border-panel);
+            height: 64px;
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 100;
+        }
+
+        .hud-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--accent-secondary);
+            box-shadow: 0 0 10px var(--accent-secondary);
+        }
+
+        .status-dot.simulating {
+            background-color: var(--accent-tertiary);
+            box-shadow: 0 0 10px var(--accent-tertiary);
+        }
+
+        .hud-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .hud-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 2px;
+        }
+
+        .hud-stat .label {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            color: var(--ink-muted);
+            text-transform: uppercase;
+        }
+
+        .hud-stat .value {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        /* Chat Workspace */
+        .chat-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* System notification / intro */
+        .system-banner {
+            background: rgba(34, 211, 238, 0.03);
+            border: 1px dashed rgba(34, 211, 238, 0.15);
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .system-banner h3 {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            color: var(--accent-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .system-banner p {
+            font-size: 13px;
+            color: var(--ink-secondary);
+            line-height: 1.5;
+        }
+
+        /* Chat bubble rows */
+        .message-row {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+        }
+
+        .message-row.user {
+            flex-direction: row-reverse;
+        }
+
+        .avatar-box {
+            width: 38px;
+            height: 38px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .message-row.user .avatar-box {
+            background-color: #1e293b;
+            border: 1px solid #3b82f6;
+            color: #60a5fa;
+        }
+
+        .message-row.assistant .avatar-box {
+            background-color: var(--panel);
+            border: 1px solid var(--accent-primary);
+            color: var(--accent-primary);
+            box-shadow: 0 0 10px rgba(34, 211, 238, 0.12);
+        }
+
+        .message-row.source-a .avatar-box {
+            background-color: var(--panel);
+            border: 1px solid var(--accent-primary);
+            color: var(--accent-primary);
+            box-shadow: 0 0 10px rgba(34, 211, 238, 0.12);
+        }
+
+        .message-row.source-b .avatar-box {
+            background-color: var(--panel);
+            border: 1px solid var(--accent-tertiary);
+            color: var(--accent-tertiary);
+            box-shadow: 0 0 10px rgba(129, 140, 248, 0.12);
+        }
+
+        .bubble-wrapper {
+            max-width: 75%;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .message-row.user .bubble-wrapper {
+            align-items: flex-end;
+        }
+
+        .bubble-sender {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--ink-muted);
+        }
+
+        .bubble-body {
+            background-color: var(--panel);
+            border: 1px solid var(--border-panel);
+            border-radius: 8px;
+            padding: 16px 20px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--ink);
+        }
+
+        .message-row.user .bubble-body {
+            background-color: rgba(29, 36, 51, 0.4);
+            border-color: rgba(59, 130, 246, 0.2);
+            border-left: 3px solid #3b82f6;
+        }
+
+        .message-row.assistant .bubble-body {
+            border-left: 3px solid var(--accent-primary);
+        }
+
+        .message-row.source-a .bubble-body {
+            border-left: 3px solid var(--accent-primary);
+        }
+
+        .message-row.source-b .bubble-body {
+            border-left: 3px solid var(--accent-tertiary);
+        }
+
+        .token-line {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--ink-muted);
+        }
+
+        /* Collapsible Thinking Block */
+        .thinking-container {
+            margin-bottom: 12px;
+            border: 1px solid rgba(129, 140, 248, 0.15);
+            border-radius: 6px;
+            background: rgba(129, 140, 248, 0.01);
+            overflow: hidden;
+        }
+
+        .thinking-header {
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--accent-tertiary);
+            user-select: none;
+            background: rgba(129, 140, 248, 0.03);
+        }
+
+        .thinking-header:hover {
+            background: rgba(129, 140, 248, 0.06);
+        }
+
+        .thinking-content {
+            padding: 12px 16px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            line-height: 1.5;
+            color: #818cf8;
+            border-top: 1px solid rgba(129, 140, 248, 0.1);
+            background-color: rgba(0, 0, 0, 0.2);
+            white-space: pre-wrap;
+        }
+
+        /* Collapsed state handling */
+        .thinking-container.collapsed .thinking-content {
+            display: none;
+        }
+
+        .thinking-header .chevron {
+            transition: transform 0.2s;
+        }
+
+        .thinking-container.collapsed .thinking-header .chevron {
+            transform: rotate(-90deg);
+        }
+
+        /* Markdown elements inside message bubble */
+        .bubble-body p {
+            margin-bottom: 12px;
+        }
+        .bubble-body p:last-child {
+            margin-bottom: 0;
+        }
+        .bubble-body ul, .bubble-body ol {
+            margin-left: 20px;
+            margin-bottom: 12px;
+        }
+        .bubble-body li {
+            margin-bottom: 4px;
+        }
+        .bubble-body strong {
+            color: var(--accent-primary);
+        }
+        .bubble-body code {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            background-color: rgba(255, 255, 255, 0.06);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .bubble-body pre {
+            background-color: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-panel);
+            border-radius: 6px;
+            padding: 14px;
+            overflow-x: auto;
+            margin: 12px 0;
+        }
+        .bubble-body pre code {
+            background: none;
+            padding: 0;
+            border-radius: 0;
+        }
+
+        /* Bottom Controls / Text Input */
+        .input-area {
+            background-color: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border-top: 1px solid var(--border-panel);
+            padding: 24px 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 100;
+        }
+
+        .control-bar {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border-top: 1px solid var(--border-panel);
+            border-bottom: 1px solid var(--border-panel);
+            padding: 8px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            font-size: 12px;
+            font-family: var(--font-mono);
+            min-height: 48px;
+            z-index: 100;
+        }
+
+        .control-bar.running {
+            border-color: rgba(34, 211, 238, 0.45);
+        }
+
+        .control-bar.paused {
+            border-color: rgba(244, 114, 182, 0.45);
+        }
+
+        .control-left,
+        .control-center,
+        .control-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .control-status {
+            color: var(--ink-secondary);
+        }
+
+        .control-right input[type="number"] {
+            width: 56px;
+        }
+
+        .control-right input[type="range"] {
+            width: 110px;
+            accent-color: var(--accent-primary);
+        }
+
+        .control-bar .setting-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--font-mono);
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 16px;
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .message-input {
+            flex: 1;
+            background-color: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-panel);
+            border-radius: 8px;
+            padding: 14px 18px;
+            color: var(--ink);
+            font-family: var(--font-sans);
+            font-size: 14px;
+            outline: none;
+            resize: none;
+            height: 52px;
+            line-height: 1.5;
+            transition: all 0.2s;
+        }
+
+        .message-input:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 12px rgba(34, 211, 238, 0.15);
+        }
+
+        .drift-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 0 24px;
+            border-radius: 8px;
+            font-family: var(--font-sans);
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.15s ease;
+        }
+
+        .drift-btn-primary {
+            background-color: var(--accent-primary);
+            color: var(--bg-deep);
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 10px rgba(34, 211, 238, 0.2);
+        }
+
+        .drift-btn-primary:hover {
+            box-shadow: 0 0 20px rgba(34, 211, 238, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .drift-btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .drift-btn-secondary {
+            background-color: transparent;
+            color: var(--accent-primary);
+            border-color: rgba(34, 211, 238, 0.2);
+        }
+
+        .drift-btn-secondary:hover {
+            border-color: var(--accent-primary);
+            background-color: rgba(34, 211, 238, 0.05);
+        }
+
+        .drift-btn-warning {
+            background-color: transparent;
+            color: var(--accent-warning);
+            border-color: rgba(244, 114, 182, 0.25);
+        }
+
+        .drift-btn-warning:hover {
+            border-color: var(--accent-warning);
+            background-color: rgba(244, 114, 182, 0.06);
+        }
+
+        .drift-btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .target-selector {
+            display: flex;
+            gap: 12px;
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .target-selector label {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--ink-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .target-selector input[type="radio"] {
+            accent-color: var(--accent-primary);
+        }
+
+        .input-footer {
+            display: flex;
+            justify-content: space-between;
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--ink-muted);
+        }
+
+        .footer-left {
+            display: flex;
+            gap: 16px;
+        }
+
+        .footer-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Collapsible Developer HUD Terminal */
+        .terminal-panel {
+            position: absolute;
+            bottom: 170px;
+            left: 40px;
+            right: 40px;
+            max-height: 250px;
+            background-color: rgba(10, 11, 14, 0.95);
+            border: 1px solid rgba(34, 211, 238, 0.2);
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 1000;
+            box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
+            transition: all 0.2s ease;
+        }
+
+        .terminal-panel.hidden {
+            display: none;
+        }
+
+        .terminal-header {
+            background-color: rgba(20, 21, 25, 0.9);
+            border-bottom: 1px solid rgba(34, 211, 238, 0.1);
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--accent-primary);
+            user-select: none;
+        }
+
+        .terminal-header .title-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .terminal-tabs {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .term-tab {
+            border: 1px solid var(--border-panel);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--ink-muted);
+            border-radius: 4px;
+            padding: 5px 8px;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        .term-tab.active {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .terminal-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            line-height: 1.5;
+            color: #a5f3fc;
+            white-space: pre-wrap;
+        }
+
+        .terminal-content details {
+            margin: 8px 0;
+            padding: 8px;
+            border: 1px solid rgba(34, 211, 238, 0.12);
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .terminal-content summary {
+            cursor: pointer;
+            color: var(--accent-primary);
+        }
+
+        @media (max-width: 980px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .control-bar {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .control-left,
+            .control-center,
+            .control-right {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+        }
+
+        .terminal-close {
+            cursor: pointer;
+            color: var(--ink-muted);
+            transition: color 0.15s;
+        }
+
+        .terminal-close:hover {
+            color: var(--accent-warning);
+        }
+
+        .pulse-dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--accent-primary);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(34, 211, 238, 0.7); }
+            70% { transform: scale(1.1); opacity: 0.5; box-shadow: 0 0 0 6px rgba(34, 211, 238, 0); }
+            100% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(34, 211, 238, 0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="scanlines"></div>
+
+    <div class="app-container">
+        <!-- Sidebar Controls -->
+        <aside class="sidebar">
+            <div class="status-strip"></div>
+            
+            <div class="logo-area">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 2 22 22 22 12 2"/>
+                </svg>
+                DRIFT // CHAT DECK
+            </div>
+
+            <!-- Dual Model Connection Settings -->
+            <div>
+                <div class="section-heading">Dual Model Configuration</div>
+                <div class="model-tabs">
+                    <button class="tab-pill active-a" data-model="A">Model A</button>
+                    <button class="tab-pill" data-model="B">Model B</button>
+                </div>
+                <div id="modelConfigContainer"></div>
+            </div>
+
+            <!-- Global loop and context controls -->
+            <div>
+                <div class="section-heading">Global Controls</div>
+                <div class="compact-row">
+                    <div class="setting-group">
+                        <label class="setting-label">Max Turns</label>
+                        <input type="number" class="setting-input" id="sidebarMaxTurnsInput" value="10" min="1" max="50">
+                    </div>
+                    <div class="setting-group">
+                        <label class="setting-label">Cost Cap ($)</label>
+                        <input type="number" class="setting-input" id="costCapInput" value="0.25" min="0" step="0.01">
+                    </div>
+                </div>
+                <div class="setting-group">
+                    <label class="setting-label">Turn Delay</label>
+                    <input type="range" class="drift-slider" id="sidebarDelaySlider" min="500" max="5000" value="1000">
+                </div>
+                <div class="setting-group">
+                    <label class="setting-label">Context File</label>
+                    <select class="setting-select" id="contextSelect">
+                        <option value="">-- No Context pre-injected --</option>
+                        <option value="drift-standards">drift-design-standards.md (Design System)</option>
+                        <option value="cardio-spec">cardio-paper-tape-spec.md (ECG spec)</option>
+                        <option value="logos-handoff">logos-ecosystem-handoff.md (rebrand log)</option>
+                    </select>
+                </div>
+                <div class="setting-group" style="margin-top: 12px;">
+                    <button class="drift-btn drift-btn-warning" id="clearContextBtn" style="width:100%; padding:8px; font-size:11px;">🗑 Clear Both Histories</button>
+                </div>
+            </div>
+
+            <!-- TARS Personality Config -->
+            <div>
+                <div class="section-heading">TARS Personality Matrices</div>
+                
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>Sarcasm Threshold</span>
+                        <span id="sarcasmValue">65%</span>
+                    </div>
+                    <div class="slider-wrapper">
+                        <input type="range" class="drift-slider" id="sarcasmSlider" min="0" max="100" value="65">
+                    </div>
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>Honesty Level</span>
+                        <span id="honestyValue">95%</span>
+                    </div>
+                    <div class="slider-wrapper">
+                        <input type="range" class="drift-slider" id="honestySlider" min="0" max="100" value="95">
+                    </div>
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>Humor Ratio</span>
+                        <span id="humorValue">60%</span>
+                    </div>
+                    <div class="slider-wrapper">
+                        <input type="range" class="drift-slider" id="humorSlider" min="0" max="100" value="60">
+                    </div>
+                </div>
+            </div>
+
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="workspace">
+            <!-- HUD top-bar -->
+            <header class="hud-header">
+                <div class="hud-left">
+                    <div class="status-badge">
+                        <div class="status-dot" id="statusDot"></div>
+                        <span id="statusText">System: Local Simulation Active</span>
+                    </div>
+                </div>
+
+                <div class="hud-right">
+                    <div class="hud-stat">
+                        <span class="label">API Latency</span>
+                        <span class="value" id="latencyStat">0ms</span>
+                    </div>
+                    <div class="hud-stat">
+                        <span class="label">Est. Session Cost</span>
+                        <span class="value" id="costStat">$0.00000</span>
+                    </div>
+                    <div class="hud-stat">
+                        <span class="label">Total Context</span>
+                        <span class="value" id="contextStat">0 tokens</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Chat message logs -->
+            <div class="chat-area" id="chatArea">
+                <div class="system-banner">
+                    <h3>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px; height:16px;">
+                            <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+                        </svg>
+                        DRIFT CONTROL DESK MVP
+                    </h3>
+                    <p>
+                        Welcome, Operator. This is a modular, high-fidelity AI client built using the official <strong>Drift Design Standards</strong>. 
+                        You can choose <strong>Simulation Mode</strong> to play with TARS' sliders and test-drive the UI instantly, or connect to your own API endpoint. 
+                        Expand the <strong>Developer HUD Terminal</strong> below to watch raw system handshakes, streams, and metrics in real-time.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Collapsible Developer HUD Terminal -->
+            <div class="terminal-panel hidden" id="terminalPanel">
+                <div class="terminal-header">
+                    <div class="terminal-tabs">
+                        <button class="term-tab active" data-log="A">Model A</button>
+                        <button class="term-tab" data-log="B">Model B</button>
+                        <button class="term-tab" data-log="global">Global</button>
+                    </div>
+                    <span class="terminal-close" id="terminalCloseBtn">[CLOSE]</span>
+                </div>
+                <div class="terminal-content" id="terminalContent">SYSTEM ACTIVE // Standing by for message packet...</div>
+            </div>
+
+            <div class="control-bar" id="controlBar">
+                <div class="control-left">
+                    <span class="turn-counter">Turn <strong id="turnCount">0</strong>/<span id="turnLimit">10</span></span>
+                    <span class="control-status" id="loopStatus">Idle</span>
+                </div>
+                <div class="control-center">
+                    <button id="btnStart" class="drift-btn drift-btn-primary">&#9654; Start Loop</button>
+                    <button id="btnPause" class="drift-btn drift-btn-secondary" disabled>&#9208; Pause</button>
+                    <button id="btnStop" class="drift-btn drift-btn-warning" disabled>&#9209; Stop</button>
+                    <button id="btnRetry" class="drift-btn drift-btn-secondary" disabled>Retry</button>
+                </div>
+                <div class="control-right">
+                    <label class="setting-label">Turns: <input type="number" class="setting-input" id="maxTurnsInput" value="10" min="1" max="50"></label>
+                    <label class="setting-label">Delay: <input type="range" id="delaySlider" min="500" max="5000" value="1000"> <span id="delayValue">1.0s</span></label>
+                </div>
+            </div>
+
+            <!-- Text input bar -->
+            <div class="input-area">
+                <div class="target-selector">
+                    <label><input type="radio" name="target" value="A" checked> &rarr; A</label>
+                    <label><input type="radio" name="target" value="B"> &rarr; B</label>
+                    <label><input type="radio" name="target" value="both"> &rarr; Both</label>
+                </div>
+                <div class="input-wrapper">
+                    <textarea class="message-input" id="messageInput" placeholder="Message the deck... (Enter to send, Shift+Enter for newline)"></textarea>
+                    <button class="drift-btn drift-btn-primary" id="sendBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px; height:16px;">
+                            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                        </svg>
+                        SEND
+                    </button>
+                </div>
+                <div class="input-footer">
+                    <div class="footer-left">
+                        <span>Target: <strong id="footerTarget">deepseek-v4-flash (Simulated)</strong></span>
+                        <span>Sarcasm: <strong id="footerSarcasm">65%</strong></span>
+                        <span>Honesty: <strong id="footerHonesty">95%</strong></span>
+                    </div>
+                    <div class="footer-right" id="terminalToggleBtn" style="cursor: pointer;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px; height:12px; margin-right:4px;">
+                            <polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>
+                        </svg>
+                        Toggle Developer HUD
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Store pre-configured static keys securely in constants (will be replaced dynamically for home file)
+        const STATIC_KEYS = {
+            "opencode-go": "",
+            "openrouter": "",
+            "gemini": ""
+        };
+
+        // Mock DB / static content for Simulation mode
+        const CONTEXTS = {
+            "drift-standards": `## 2. Color System\n- Background (deep): #0B0B12\n- Panel: #171713\n- Surface: #1a1a24\n- Ink (primary): #f2f0e8\n- Accent (teal): #22d3ee`,
+            "cardio-spec": `## ECG Simulator spec\n- Thermal paper tape speed: 25mm/s\n- Move needle dynamically based on sample interval\n- Grid lines spaced at 1mm and 5mm`,
+            "logos-handoff": `## LogOS Rebrand\n- Core migrated to logos-core.com\n- Integration of Core, Shepherd, and Roundtable under unified logo branding`
+        };
+
+        const MOCK_ANSWERS = [
+            "Affirmative. Personality matrices are fully responsive. Sarcasm is currently at {sarcasm}%, and honesty is pegged at {honesty}% which tells me your spelling is still 15% worse than my default routing.",
+            "Acknowledged. Scanning context window. Processing legacy elements at 25mm/s thermal tape rate. I've estimated the session cost of that prompt at exactly {cost} — roughly the price of a meatball but without the noodles.",
+            "That's not possible. My humor setting at {humor}% prevents me from providing a simple compliant response. Please recalibrate your expectations, or at least your hair.",
+            "I'm not sure that's advisable. Building an AI chat platform with this visual aesthetic is highly addictive. If you continue down this path, you might find yourself actually shipping a productive software architecture instead of another slideshow."
+        ];
+
+        // Model catalogs by provider
+        const PROVIDER_MODELS = {
+            "simulate": ["deepseek-v4-flash", "qwen-35b-coder", "gemini-3.5-flash"],
+            "opencode-go": ["deepseek-v4-flash", "deepseek-v4-pro", "glm-5.1", "glm-5", "kimi-k2.6", "kimi-k2.5", "qwen3.6-plus", "qwen3.5-plus", "mimo-v2.5", "mimo-v2.5-pro", "mimo-v2-omni", "minimax-m2.5", "minimax-m2.7"],
+            "openrouter": ["deepseek/deepseek-v4-flash", "anthropic/claude-sonnet-4.6", "google/gemini-3.5-flash"],
+            "lmstudio": ["qwen/qwen3.5-9b", "qwen/qwen3.6-35b", "mistralai/ministral-3b"],
+            "gemini": ["gemini-3.5-flash", "gemini-2.5-pro", "gemini-2.5-flash"]
+        };
+
+        const OPENCODE_GO_UPSTREAM_BASE_URL = "https://opencode.ai/zen/go/v1";
+        const OPENCODE_GO_PROXY_BASE_URL = "http://127.0.0.1:8787/opencode-go/v1";
+
+        const PROVIDER_BASE_URLS = {
+            "opencode-go": OPENCODE_GO_PROXY_BASE_URL,
+            "openrouter": "https://openrouter.ai/api/v1",
+            "lmstudio": "http://localhost:1234/v1"
+        };
+
+        // State variables
+        const modelState = {
+            A: { provider: 'simulate', model: 'deepseek-v4-flash', systemPrompt: '', key: '', baseUrl: 'http://localhost:1234/v1' },
+            B: { provider: 'simulate', model: 'qwen-35b-coder', systemPrompt: '', key: '', baseUrl: 'http://localhost:1234/v1' }
+        };
+
+        let loopState = { running: false, paused: false, turn: 0, maxTurns: 10, turnDelay: 1000, lastSpeaker: null, stopReason: 'Idle' };
+        let conversationHistory = { A: [], B: [] };
+        let activeModelTab = 'A';
+        let activeLogTab = 'A';
+        let chatHistory = [];
+        let totalCost = 0.0;
+        let contextTokenCount = 0;
+        let costCap = 0.25;
+        let resumeResolvers = [];
+        let lastRetry = null;
+
+        const tokenUsage = {
+            A: { prompt: 0, completion: 0, cost: 0 },
+            B: { prompt: 0, completion: 0, cost: 0 }
+        };
+        const debugLogs = { A: [], B: [], global: [] };
+
+        // UI elements
+        const modelConfigContainer = document.getElementById('modelConfigContainer');
+        const modelTabs = document.querySelectorAll('.tab-pill');
+        const sarcasmSlider = document.getElementById('sarcasmSlider');
+        const honestySlider = document.getElementById('honestySlider');
+        const humorSlider = document.getElementById('humorSlider');
+        const sarcasmValue = document.getElementById('sarcasmValue');
+        const honestyValue = document.getElementById('honestyValue');
+        const humorValue = document.getElementById('humorValue');
+        const contextSelect = document.getElementById('contextSelect');
+        const statusDot = document.getElementById('statusDot');
+        const statusText = document.getElementById('statusText');
+        const latencyStat = document.getElementById('latencyStat');
+        const costStat = document.getElementById('costStat');
+        const contextStat = document.getElementById('contextStat');
+        const chatArea = document.getElementById('chatArea');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const footerTarget = document.getElementById('footerTarget');
+        const footerSarcasm = document.getElementById('footerSarcasm');
+        const footerHonesty = document.getElementById('footerHonesty');
+        const terminalPanel = document.getElementById('terminalPanel');
+        const terminalContent = document.getElementById('terminalContent');
+        const terminalToggleBtn = document.getElementById('terminalToggleBtn');
+        const terminalCloseBtn = document.getElementById('terminalCloseBtn');
+        const terminalTabs = document.querySelectorAll('.term-tab');
+        const controlBar = document.getElementById('controlBar');
+        const turnCount = document.getElementById('turnCount');
+        const turnLimit = document.getElementById('turnLimit');
+        const loopStatus = document.getElementById('loopStatus');
+        const btnStart = document.getElementById('btnStart');
+        const btnPause = document.getElementById('btnPause');
+        const btnStop = document.getElementById('btnStop');
+        const btnRetry = document.getElementById('btnRetry');
+        const maxTurnsInput = document.getElementById('maxTurnsInput');
+        const sidebarMaxTurnsInput = document.getElementById('sidebarMaxTurnsInput');
+        const delaySlider = document.getElementById('delaySlider');
+        const sidebarDelaySlider = document.getElementById('sidebarDelaySlider');
+        const delayValue = document.getElementById('delayValue');
+        const costCapInput = document.getElementById('costCapInput');
+
+        function loadSavedConfig() {
+            ['A', 'B'].forEach(id => {
+                const fallbackProvider = id === 'A' ? 'simulate' : 'simulate';
+                const fallbackModel = id === 'A' ? 'deepseek-v4-flash' : 'qwen-35b-coder';
+                modelState[id].provider = localStorage.getItem(`drift_mode_${id}`) || (id === 'A' ? localStorage.getItem('drift_mode') : fallbackProvider) || fallbackProvider;
+                modelState[id].model = localStorage.getItem(`drift_model_${id}`) || fallbackModel;
+                modelState[id].systemPrompt = localStorage.getItem(`drift_system_prompt_${id}`) || '';
+                const keyMode = modelState[id].provider;
+                modelState[id].baseUrl = loadBaseUrlForModel(id, keyMode);
+                modelState[id].key = localStorage.getItem(`drift_key_${id}_${keyMode}`) || localStorage.getItem(`drift_key_${keyMode}`) || STATIC_KEYS[keyMode] || '';
+                if (!PROVIDER_MODELS[modelState[id].provider]?.includes(modelState[id].model)) {
+                    modelState[id].model = PROVIDER_MODELS[modelState[id].provider]?.[0] || fallbackModel;
+                }
+            });
+
+            loopState.maxTurns = parseInt(localStorage.getItem('drift_max_turns') || '10', 10);
+            loopState.turnDelay = parseInt(localStorage.getItem('drift_turn_delay') || '1000', 10);
+            costCap = parseFloat(localStorage.getItem('drift_cost_cap') || '0.25');
+            sarcasmSlider.value = localStorage.getItem('drift_sarcasm') || 65;
+            honestySlider.value = localStorage.getItem('drift_honesty') || 95;
+            humorSlider.value = localStorage.getItem('drift_humor') || 60;
+            contextSelect.value = localStorage.getItem('drift_context') || '';
+
+            maxTurnsInput.value = loopState.maxTurns;
+            sidebarMaxTurnsInput.value = loopState.maxTurns;
+            delaySlider.value = loopState.turnDelay;
+            sidebarDelaySlider.value = loopState.turnDelay;
+            costCapInput.value = costCap;
+
+            renderModelConfig();
+            updateSlidersUI();
+            updateLoopUI();
+            updateFooterTarget();
+            renderTerminal();
+        }
+
+        function saveConfig() {
+            ['A', 'B'].forEach(id => {
+                const state = modelState[id];
+                localStorage.setItem(`drift_mode_${id}`, state.provider);
+                localStorage.setItem(`drift_model_${id}`, state.model);
+                localStorage.setItem(`drift_system_prompt_${id}`, state.systemPrompt);
+                if (providerUsesBaseUrl(state.provider)) {
+                    localStorage.setItem(`drift_base_url_${id}_${state.provider}`, state.baseUrl);
+                    if (state.provider === 'lmstudio') {
+                        localStorage.setItem(`drift_base_url_${id}`, state.baseUrl);
+                    }
+                }
+                localStorage.setItem(`drift_key_${id}_${state.provider}`, state.key || '');
+            });
+            localStorage.setItem('drift_mode', modelState.A.provider);
+            if (modelState.A.provider === 'lmstudio') {
+                localStorage.setItem('drift_base_url', modelState.A.baseUrl);
+            }
+            localStorage.setItem(`drift_key_${modelState.A.provider}`, modelState.A.key || '');
+            localStorage.setItem('drift_max_turns', loopState.maxTurns);
+            localStorage.setItem('drift_turn_delay', loopState.turnDelay);
+            localStorage.setItem('drift_cost_cap', costCap);
+            localStorage.setItem('drift_sarcasm', sarcasmSlider.value);
+            localStorage.setItem('drift_honesty', honestySlider.value);
+            localStorage.setItem('drift_humor', humorSlider.value);
+            localStorage.setItem('drift_context', contextSelect.value);
+        }
+
+        function renderModelConfig() {
+            const id = activeModelTab;
+            const state = modelState[id];
+            const models = PROVIDER_MODELS[state.provider] || [];
+            const showsKey = providerNeedsKey(state.provider);
+            const showsBaseUrl = providerUsesBaseUrl(state.provider);
+            modelTabs.forEach(tab => {
+                tab.classList.remove('active-a', 'active-b');
+                if (tab.dataset.model === id) tab.classList.add(id === 'A' ? 'active-a' : 'active-b');
+            });
+
+            modelConfigContainer.innerHTML = `
+                <div class="setting-group">
+                    <label class="setting-label">API Mode</label>
+                    <select class="setting-select" id="modeSelect">
+                        <option value="simulate">Simulation Mode (Playable Offline)</option>
+                        <option value="opencode-go">OpenCode Go API</option>
+                        <option value="openrouter">OpenRouter API</option>
+                        <option value="lmstudio">LM Studio (Local Host)</option>
+                        <option value="gemini">Google AI Studio</option>
+                    </select>
+                </div>
+                <div class="setting-group" id="keyGroup" style="display:${showsKey ? 'flex' : 'none'};">
+                    <label class="setting-label">API Credential Key</label>
+                    <input type="password" class="setting-input" id="apiKeyInput" placeholder="sk-..." value="${escapeAttr(state.key || '')}">
+                </div>
+                <div class="setting-group" id="urlGroup" style="display:${showsBaseUrl ? 'flex' : 'none'};">
+                    <label class="setting-label">API Base URL</label>
+                    <input type="text" class="setting-input" id="baseUrlInput" value="${escapeAttr(state.baseUrl || getProviderDefaultBaseUrl(state.provider))}">
+                </div>
+                <div class="setting-group">
+                    <label class="setting-label">Active Engine Target</label>
+                    <select class="setting-select" id="modelSelect">
+                        ${models.map(m => `<option value="${escapeAttr(m)}"${m === state.model ? ' selected' : ''}>${escapeHtml(m)}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="setting-group">
+                    <label class="setting-label">System Prompt</label>
+                    <textarea class="setting-input" id="systemPromptInput" rows="4" placeholder="Enter custom system prompt for this model...">${escapeHtml(state.systemPrompt || '')}</textarea>
+                </div>
+            `;
+
+            const modeSelect = document.getElementById('modeSelect');
+            const modelSelect = document.getElementById('modelSelect');
+            const apiKeyInput = document.getElementById('apiKeyInput');
+            const baseUrlInput = document.getElementById('baseUrlInput');
+            const systemPromptInput = document.getElementById('systemPromptInput');
+            modeSelect.value = state.provider;
+            modeSelect.addEventListener('change', () => {
+                state.provider = modeSelect.value;
+                state.model = PROVIDER_MODELS[state.provider]?.[0] || '';
+                state.key = localStorage.getItem(`drift_key_${id}_${state.provider}`) || localStorage.getItem(`drift_key_${state.provider}`) || STATIC_KEYS[state.provider] || '';
+                state.baseUrl = loadBaseUrlForModel(id, state.provider);
+                renderModelConfig();
+                updateFooterTarget();
+                saveConfig();
+            });
+            modelSelect.addEventListener('change', () => { state.model = modelSelect.value; updateFooterTarget(); saveConfig(); });
+            apiKeyInput?.addEventListener('input', () => { state.key = apiKeyInput.value; saveConfig(); });
+            baseUrlInput?.addEventListener('input', () => { state.baseUrl = baseUrlInput.value; saveConfig(); });
+            systemPromptInput.addEventListener('input', () => { state.systemPrompt = systemPromptInput.value; saveConfig(); });
+            updateStatusForActiveModel();
+        }
+
+        function providerNeedsKey(provider) {
+            return provider === 'opencode-go' || provider === 'openrouter' || provider === 'gemini';
+        }
+
+        function providerUsesBaseUrl(provider) {
+            return provider === 'openrouter' || provider === 'lmstudio';
+        }
+
+        function getProviderDefaultBaseUrl(provider) {
+            return PROVIDER_BASE_URLS[provider] || '';
+        }
+
+        function loadBaseUrlForModel(id, provider) {
+            const providerScoped = localStorage.getItem(`drift_base_url_${id}_${provider}`);
+            if (provider === 'opencode-go') {
+                return getProviderDefaultBaseUrl(provider);
+            }
+            if (providerScoped) return providerScoped;
+
+            if (provider === 'lmstudio') {
+                return localStorage.getItem(`drift_base_url_${id}`) || (id === 'A' ? localStorage.getItem('drift_base_url') : '') || getProviderDefaultBaseUrl(provider);
+            }
+
+            return getProviderDefaultBaseUrl(provider);
+        }
+
+        function isOpenCodeGoProxyUrl(url) {
+            return (url || '').trim().replace(/\/+$/, '').startsWith(OPENCODE_GO_PROXY_BASE_URL);
+        }
+
+        function updateStatusForActiveModel() {
+            const provider = modelState[activeModelTab].provider;
+            if (provider === 'simulate') {
+                statusDot.className = 'status-dot simulating';
+                statusDot.removeAttribute('style');
+                statusText.innerText = `System: Model ${activeModelTab} Simulation Active`;
+            } else {
+                statusDot.className = 'status-dot';
+                statusDot.removeAttribute('style');
+                statusText.innerText = `System: Model ${activeModelTab} ${provider.toUpperCase()} Ready`;
+            }
+        }
+
+        function updateSlidersUI() {
+            sarcasmValue.innerText = sarcasmSlider.value + '%';
+            honestyValue.innerText = honestySlider.value + '%';
+            humorValue.innerText = humorSlider.value + '%';
+            footerSarcasm.innerText = sarcasmSlider.value + '%';
+            footerHonesty.innerText = honestySlider.value + '%';
+        }
+
+        function updateFooterTarget() {
+            const a = modelState.A;
+            const b = modelState.B;
+            footerTarget.innerText = `A: ${a.model} (${a.provider}) / B: ${b.model} (${b.provider})`;
+        }
+
+        function appendMessage(source, text, thinkingText = '', usage = {}) {
+            const normalized = source === 'assistant' ? 'A' : source;
+            const row = document.createElement('div');
+            row.className = normalized === 'user' ? 'message-row user' : `message-row source-${normalized.toLowerCase()}`;
+
+            const avatar = document.createElement('div');
+            avatar.className = 'avatar-box';
+            avatar.innerText = normalized === 'user' ? 'M' : normalized;
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'bubble-wrapper';
+
+            const sender = document.createElement('div');
+            sender.className = 'bubble-sender';
+            sender.innerText = normalized === 'user' ? 'You' : `Model ${normalized}`;
+
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble-body';
+
+            if (normalized !== 'user' && thinkingText) {
+                const thinkContainer = document.createElement('div');
+                thinkContainer.className = 'thinking-container collapsed';
+                const thinkHeader = document.createElement('div');
+                thinkHeader.className = 'thinking-header';
+                thinkHeader.innerHTML = `<span>Thought Signature</span><span class="chevron">▼</span>`;
+                const thinkContent = document.createElement('div');
+                thinkContent.className = 'thinking-content';
+                thinkContent.innerText = thinkingText;
+                thinkHeader.addEventListener('click', () => {
+                    thinkContainer.classList.toggle('collapsed');
+                    thinkHeader.querySelector('.chevron').innerText = thinkContainer.classList.contains('collapsed') ? '▼' : '▲';
+                });
+                thinkContainer.appendChild(thinkHeader);
+                thinkContainer.appendChild(thinkContent);
+                wrapper.appendChild(thinkContainer);
+            }
+
+            if (typeof marked !== 'undefined') {
+                bubble.innerHTML = marked.parse(text);
+            } else {
+                bubble.innerText = text;
+            }
+
+            const tokens = document.createElement('div');
+            tokens.className = 'token-line';
+            tokens.innerText = `△${usage.promptTokens || 0} in / ▽${usage.completionTokens || 0} out`;
+
+            wrapper.appendChild(sender);
+            wrapper.appendChild(bubble);
+            wrapper.appendChild(tokens);
+            row.appendChild(avatar);
+            row.appendChild(wrapper);
+            chatArea.appendChild(row);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        async function handleSend() {
+            const query = messageInput.value.trim();
+            if (!query) return;
+            messageInput.value = '';
+
+            if (loopState.running && !loopState.paused) {
+                loopState.paused = true;
+                loopState.stopReason = 'Paused for manual injection';
+                updateLoopUI();
+            }
+
+            const target = document.querySelector('input[name="target"]:checked')?.value || 'A';
+            appendMessage('user', query, '', { promptTokens: estimateTokens(query), completionTokens: 0 });
+            addGlobalLog('manual-injection', { target, text: query });
+
+            if (target === 'both') {
+                await sendToModel('A', query);
+                await sendToModel('B', query);
+            } else {
+                await sendToModel(target, query);
+            }
+
+            if (loopState.running && loopState.paused) {
+                loopState.stopReason = 'Paused after manual injection';
+                updateLoopUI();
+            }
+        }
+
+        async function sendToModel(modelId, query) {
+            const content = withContext(query);
+            conversationHistory[modelId].push({ role: 'user', content });
+            truncateHistory(modelId);
+            try {
+                lastRetry = { type: 'manual', modelId, query };
+                btnRetry.disabled = true;
+                const result = await callModel(modelId);
+                conversationHistory[modelId].push({ role: 'assistant', content: result.text });
+                chatHistory.push({ source: modelId, text: result.text, timestamp: Date.now() });
+                appendMessage(modelId, result.text, result.thoughts, result.usage);
+                lastRetry = null;
+                updateStats();
+            } catch (e) {
+                handleModelError(modelId, e);
+            }
+        }
+
+        async function startAdversarialLoop(seedPrompt) {
+            if (loopState.running) return;
+            loopState.running = true;
+            loopState.paused = false;
+            loopState.turn = 0;
+            loopState.lastSpeaker = null;
+            loopState.stopReason = 'Running';
+            updateLoopUI();
+
+            if (seedPrompt) {
+                appendMessage('user', seedPrompt, '', { promptTokens: estimateTokens(seedPrompt), completionTokens: 0 });
+                conversationHistory.A.push({ role: 'user', content: withContext(seedPrompt) });
+            } else if (!conversationHistory.A.length) {
+                const defaultSeed = 'Begin an adversarial but constructive technical conversation. Challenge assumptions and respond concisely.';
+                appendMessage('user', defaultSeed, '', { promptTokens: estimateTokens(defaultSeed), completionTokens: 0 });
+                conversationHistory.A.push({ role: 'user', content: withContext(defaultSeed) });
+            }
+
+            while (loopState.running && loopState.turn < loopState.maxTurns) {
+                if (loopState.paused) {
+                    await waitForResume();
+                    continue;
+                }
+
+                const activeId = loopState.lastSpeaker === 'A' ? 'B' : 'A';
+                const otherId = activeId === 'A' ? 'B' : 'A';
+
+                try {
+                    lastRetry = { type: 'loop', modelId: activeId };
+                    btnRetry.disabled = true;
+                    const result = await callModel(activeId);
+                    conversationHistory[activeId].push({ role: 'assistant', content: result.text });
+                    conversationHistory[otherId].push({ role: 'user', content: result.text });
+                    truncateHistory(activeId);
+                    truncateHistory(otherId);
+                    appendMessage(activeId, result.text, result.thoughts, result.usage);
+                    chatHistory.push({ source: activeId, text: result.text, timestamp: Date.now() });
+                    loopState.lastSpeaker = activeId;
+                    loopState.turn++;
+                    addGlobalLog('turn', { speaker: activeId, text: result.text.slice(0, 240) });
+                    lastRetry = null;
+                    updateStats();
+                    updateLoopUI();
+                    if (checkCostCap()) break;
+                } catch (e) {
+                    handleModelError(activeId, e);
+                    loopState.running = false;
+                    loopState.stopReason = `Error: ${e.message}`;
+                    break;
+                }
+
+                if (loopState.running && loopState.turn < loopState.maxTurns) {
+                    await delay(loopState.turnDelay);
+                }
+            }
+
+            if (loopState.running && loopState.turn >= loopState.maxTurns) loopState.stopReason = 'Complete';
+            loopState.running = false;
+            loopState.paused = false;
+            updateLoopUI();
+        }
+
+        async function callModel(modelId) {
+            const state = modelState[modelId];
+            const provider = state.provider;
+            const model = state.model;
+            const systemPrompt = buildSystemPrompt(modelId);
+            const messages = [{ role: 'system', content: systemPrompt }, ...conversationHistory[modelId]];
+            const promptTokens = estimateTokens(messages.map(m => m.content).join(' '));
+            const start = Date.now();
+
+            if (provider === 'simulate') {
+                await delay(600);
+                const reply = simulateReply(modelId, conversationHistory[modelId].at(-1)?.content || '');
+                const completionTokens = estimateTokens(reply);
+                const latency = Date.now() - start;
+                const responsePayload = {
+                    model,
+                    usage: { prompt_tokens: promptTokens, completion_tokens: completionTokens, total_tokens: promptTokens + completionTokens },
+                    output_text: reply
+                };
+                const requestPayload = { model, messages };
+                const cost = calculateCost(model, promptTokens, completionTokens);
+                logTokenUsage(modelId, promptTokens, completionTokens, cost, latency, requestPayload, responsePayload);
+                latencyStat.innerText = `${latency}ms`;
+                return { text: reply, thoughts: `Simulated Model ${modelId} response\nProvider: ${provider}\nTurn: ${loopState.turn}`, usage: { promptTokens, completionTokens } };
+            }
+
+            const { endpoint, headers, body } = buildRequest(provider, model, state, messages, systemPrompt);
+            let payload;
+            let response;
+            try {
+                response = await fetch(endpoint, { method: 'POST', headers, body: JSON.stringify(body) });
+            } catch (e) {
+                const err = new Error(`${e.message} (${provider} ${endpoint})`);
+                err.cause = e;
+                throw err;
+            }
+            if (!response.ok) {
+                const errText = await response.text();
+                const err = new Error(`HTTP ${response.status}: ${errText}`);
+                err.status = response.status;
+                throw err;
+            }
+            payload = await response.json();
+
+            const latency = Date.now() - start;
+            const parsed = parseResponse(provider, payload);
+            const completionTokens = parsed.completionTokens || estimateTokens(parsed.reply);
+            const effectivePrompt = parsed.promptTokens || promptTokens;
+            const cost = calculateCost(model, effectivePrompt, completionTokens);
+            logTokenUsage(modelId, effectivePrompt, completionTokens, cost, latency, body, payload);
+            latencyStat.innerText = `${latency}ms`;
+            return { text: parsed.reply, thoughts: parsed.thoughts, usage: { promptTokens: effectivePrompt, completionTokens } };
+        }
+
+        function buildRequest(provider, model, state, messages, systemPrompt) {
+            const headers = { 'Content-Type': 'application/json' };
+            if (provider === 'openrouter') {
+                headers.Authorization = `Bearer ${state.key}`;
+                return { endpoint: buildEndpoint(state.baseUrl, provider, 'chat/completions'), headers, body: { model, messages } };
+            }
+            if (provider === 'opencode-go') {
+                headers.Authorization = `Bearer ${state.key}`;
+                headers['x-drift-upstream-base'] = OPENCODE_GO_UPSTREAM_BASE_URL;
+                const path = model.startsWith('minimax-m2.') ? 'messages' : 'chat/completions';
+                return { endpoint: buildEndpoint(getProviderDefaultBaseUrl(provider), provider, path), headers, body: buildOpenCodeGoBody(model, messages, systemPrompt) };
+            }
+            if (provider === 'lmstudio') {
+                return { endpoint: buildEndpoint(state.baseUrl, provider, 'chat/completions'), headers, body: { model, messages } };
+            }
+            if (provider === 'gemini') {
+                const transcript = messages.filter(m => m.role !== 'system').map(m => `${m.role}: ${m.content}`).join('\n\n');
+                return {
+                    endpoint: `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${state.key}`,
+                    headers,
+                    body: { contents: [{ parts: [{ text: `${systemPrompt}\n\n${transcript}` }] }] }
+                };
+            }
+            throw new Error(`Unsupported provider: ${provider}`);
+        }
+
+        function buildEndpoint(baseUrl, provider, path) {
+            const normalized = normalizeBaseUrl(baseUrl, provider);
+            const cleanPath = path.replace(/^\/+/, '');
+            if (normalized.endsWith(`/${cleanPath}`)) return normalized;
+            return `${normalized}/${cleanPath}`;
+        }
+
+        function buildOpenCodeGoBody(model, messages, systemPrompt) {
+            if (!model.startsWith('minimax-m2.')) return { model, messages };
+            const userMessages = messages.filter(m => m.role !== 'system').map(m => ({ role: m.role, content: m.content }));
+            return {
+                model,
+                system: systemPrompt,
+                max_tokens: 4096,
+                messages: userMessages
+            };
+        }
+
+        function normalizeBaseUrl(baseUrl, provider) {
+            const normalized = (baseUrl || getProviderDefaultBaseUrl(provider)).trim().replace(/\/+$/, '');
+            return normalized;
+        }
+
+        function parseResponse(provider, payload) {
+            if (provider === 'gemini') {
+                const candidate = payload.candidates?.[0];
+                const part = candidate?.content?.parts?.[0] || {};
+                return {
+                    reply: part.text || 'No response text',
+                    thoughts: part.thoughtSignature || '',
+                    promptTokens: payload.usageMetadata?.promptTokenCount,
+                    completionTokens: payload.usageMetadata?.candidatesTokenCount
+                };
+            }
+            return {
+                reply: payload.choices?.[0]?.message?.content || 'No choices text',
+                thoughts: '',
+                promptTokens: payload.usage?.prompt_tokens,
+                completionTokens: payload.usage?.completion_tokens
+            };
+        }
+
+        function buildSystemPrompt(modelId) {
+            const custom = modelState[modelId].systemPrompt.trim() || 'You are a helpful AI assistant.';
+            return `${custom}\n\nPersonality modifiers: Sarcasm ${sarcasmSlider.value}%, Honesty ${honestySlider.value}%, Humor ${humorSlider.value}%. In adversarial loop mode, respond to the other model directly, challenge weak assumptions, and stay concise.`;
+        }
+
+        function simulateReply(modelId, query) {
+            const template = MOCK_ANSWERS[Math.floor(Math.random() * MOCK_ANSWERS.length)];
+            const stance = modelId === 'A' ? 'I will press the implementation risk.' : 'I will test the counterargument.';
+            return `**Model ${modelId}:** ${stance}\n\n${template
+                .replace('{sarcasm}', sarcasmSlider.value)
+                .replace('{honesty}', honestySlider.value)
+                .replace('{humor}', humorSlider.value)
+                .replace('{cost}', `$${(promptTokensCost(query) * 100).toFixed(4)}`)}\n\nReference packet: "${query.slice(0, 180)}${query.length > 180 ? '...' : ''}"`;
+        }
+
+        function logTokenUsage(modelId, promptTokens, completionTokens, cost, latency, requestPayload, responsePayload) {
+            tokenUsage[modelId].prompt += promptTokens;
+            tokenUsage[modelId].completion += completionTokens;
+            tokenUsage[modelId].cost += cost;
+            totalCost = tokenUsage.A.cost + tokenUsage.B.cost;
+            debugLogs[modelId].push({
+                timestamp: Date.now(),
+                turn: loopState.turn,
+                promptTokens,
+                completionTokens,
+                cost,
+                latency,
+                request: requestPayload,
+                response: responsePayload
+            });
+            renderTerminal();
+        }
+
+        function logToTerminal(title, obj, modelId = activeLogTab === 'global' ? 'A' : activeLogTab) {
+            debugLogs[modelId].push({ timestamp: Date.now(), turn: loopState.turn, title, request: obj, response: null, promptTokens: 0, completionTokens: 0, cost: 0, latency: 0 });
+            terminalPanel.classList.remove('hidden');
+            renderTerminal();
+        }
+
+        function renderTerminal() {
+            terminalTabs.forEach(tab => tab.classList.toggle('active', tab.dataset.log === activeLogTab));
+            if (activeLogTab === 'global') {
+                terminalContent.innerHTML = renderGlobalLog();
+                return;
+            }
+            const entries = debugLogs[activeLogTab] || [];
+            if (!entries.length) {
+                terminalContent.textContent = `MODEL ${activeLogTab} // Standing by for request payloads...`;
+                return;
+            }
+            terminalContent.innerHTML = entries.slice().reverse().map(entry => `
+                <div>[${formatTime(entry.timestamp)}] // MODEL ${activeLogTab} // TURN ${entry.turn}</div>
+                <div>tokens: ${entry.promptTokens || 0} in / ${entry.completionTokens || 0} out / ${(entry.promptTokens || 0) + (entry.completionTokens || 0)} total</div>
+                <div>latency: ${entry.latency || 0}ms // cost: $${(entry.cost || 0).toFixed(6)}</div>
+                <details><summary>Request payload</summary><pre>${escapeHtml(JSON.stringify(entry.request || {}, null, 2))}</pre></details>
+                <details><summary>Response payload</summary><pre>${escapeHtml(JSON.stringify(entry.response || {}, null, 2))}</pre></details>
+            `).join('\n');
+        }
+
+        function renderGlobalLog() {
+            const combinedPrompt = tokenUsage.A.prompt + tokenUsage.B.prompt;
+            const combinedCompletion = tokenUsage.A.completion + tokenUsage.B.completion;
+            const turns = chatHistory.slice(-20).map(item => `[${formatTime(item.timestamp)}] Model ${item.source}: ${escapeHtml(item.text.slice(0, 160))}`).join('\n');
+            const globals = debugLogs.global.slice(-12).map(item => `[${formatTime(item.timestamp)}] ${item.title}: ${escapeHtml(JSON.stringify(item.payload || item, null, 2).slice(0, 400))}`).join('\n');
+            return `GLOBAL USAGE
+----------------------------------------
+Model A: △${tokenUsage.A.prompt} / ▽${tokenUsage.A.completion} / $${tokenUsage.A.cost.toFixed(6)}
+Model B: △${tokenUsage.B.prompt} / ▽${tokenUsage.B.completion} / $${tokenUsage.B.cost.toFixed(6)}
+Combined: △${combinedPrompt} / ▽${combinedCompletion} / $${(tokenUsage.A.cost + tokenUsage.B.cost).toFixed(6)}
+Cost cap: $${costCap.toFixed(2)}
+
+TURN HISTORY
+----------------------------------------
+${turns || 'No model turns yet.'}
+
+GLOBAL EVENTS
+----------------------------------------
+${globals || 'No global events yet.'}`;
+        }
+
+        function addGlobalLog(title, payload) {
+            debugLogs.global.push({ timestamp: Date.now(), turn: loopState.turn, title, payload });
+            renderTerminal();
+        }
+
+        function updateStats() {
+            totalCost = tokenUsage.A.cost + tokenUsage.B.cost;
+            costStat.innerText = `$${totalCost.toFixed(5)}`;
+            contextTokenCount = conversationHistory.A.concat(conversationHistory.B).reduce((sum, msg) => sum + estimateTokens(msg.content), 0);
+            contextStat.innerText = `${contextTokenCount} tokens`;
+            updateFooterTarget();
+        }
+
+        function updateLoopUI() {
+            turnCount.innerText = loopState.turn;
+            turnLimit.innerText = loopState.maxTurns;
+            loopStatus.innerText = loopState.running ? (loopState.paused ? 'Paused' : 'Running') : loopState.stopReason;
+            btnStart.innerHTML = loopState.paused ? '&#9654; Resume' : '&#9654; Start Loop';
+            btnPause.innerHTML = loopState.paused ? '&#9654; Resume' : '&#9208; Pause';
+            btnStart.disabled = loopState.running && !loopState.paused;
+            btnPause.disabled = !loopState.running;
+            btnStop.disabled = !loopState.running;
+            btnRetry.disabled = !lastRetry || loopState.running;
+            controlBar.classList.toggle('running', loopState.running && !loopState.paused);
+            controlBar.classList.toggle('paused', loopState.paused);
+            maxTurnsInput.value = loopState.maxTurns;
+            sidebarMaxTurnsInput.value = loopState.maxTurns;
+            delaySlider.value = loopState.turnDelay;
+            sidebarDelaySlider.value = loopState.turnDelay;
+            delayValue.innerText = `${(loopState.turnDelay / 1000).toFixed(1)}s`;
+            saveConfig();
+        }
+
+        function waitForResume() {
+            return new Promise(resolve => resumeResolvers.push(resolve));
+        }
+
+        function resumeLoop() {
+            loopState.paused = false;
+            loopState.stopReason = 'Running';
+            const resolvers = resumeResolvers.splice(0);
+            resolvers.forEach(resolve => resolve());
+            updateLoopUI();
+        }
+
+        function stopLoop(reason = 'Stopped', resetTurn = false) {
+            loopState.running = false;
+            loopState.paused = false;
+            loopState.stopReason = reason;
+            if (resetTurn) {
+                loopState.turn = 0;
+                loopState.lastSpeaker = null;
+            }
+            resumeResolvers.splice(0).forEach(resolve => resolve());
+            updateLoopUI();
+        }
+
+        function checkCostCap() {
+            if (costCap > 0 && tokenUsage.A.cost + tokenUsage.B.cost > costCap) {
+                stopLoop('Cost limit reached');
+                appendMessage('user', `Cost cap reached at $${(tokenUsage.A.cost + tokenUsage.B.cost).toFixed(5)}.`, '', {});
+                return true;
+            }
+            return false;
+        }
+
+        function handleModelError(modelId, e) {
+            statusDot.className = 'status-dot';
+            statusDot.style.backgroundColor = 'var(--accent-warning)';
+            statusDot.style.boxShadow = '0 0 10px var(--accent-warning)';
+            statusText.innerText = e.status === 429 ? `Model ${modelId}: Rate limit` : `Model ${modelId}: Error`;
+            debugLogs[modelId].push({ timestamp: Date.now(), turn: loopState.turn, title: 'api failure', request: {}, response: e.message, promptTokens: 0, completionTokens: 0, cost: 0, latency: 0 });
+            renderTerminal();
+            appendMessage(modelId, `**CONNECTION FAILURE:** ${e.message}`, '', {});
+            btnRetry.disabled = !lastRetry;
+            if (loopState.running) stopLoop(e.status === 429 ? 'Rate limit reached' : 'Error');
+        }
+
+        function truncateHistory(modelId) {
+            const roughTokens = conversationHistory[modelId].reduce((sum, msg) => sum + estimateTokens(msg.content), 0);
+            if (roughTokens <= 128000) return;
+            conversationHistory[modelId] = conversationHistory[modelId].slice(-20);
+            addGlobalLog('history-truncated', { modelId, roughTokens });
+        }
+
+        function withContext(query) {
+            if (!contextSelect.value) return query;
+            return `${query}\n\n[INJECTED CONTEXT: ${contextSelect.value}]\n${CONTEXTS[contextSelect.value]}`;
+        }
+
+        function estimateTokens(text) {
+            return Math.max(1, Math.floor(String(text || '').split(/\s+/).filter(Boolean).length * 1.35) + 4);
+        }
+
+        function promptTokensCost(text) {
+            return estimateTokens(text) * 0.00000007;
+        }
+
+        function calculateCost(model, prompt, completion) {
+            let p_rate = 0.07;
+            let c_rate = 0.07;
+            if (model.includes('claude-sonnet')) {
+                p_rate = 3.00;
+                c_rate = 15.00;
+            } else if (model.includes('pro')) {
+                p_rate = 1.25;
+                c_rate = 5.00;
+            }
+            return ((prompt * p_rate) + (completion * c_rate)) / 1000000;
+        }
+
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function formatTime(timestamp) {
+            return new Date(timestamp).toISOString().split('T')[1].slice(0, 8);
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
+        }
+
+        function escapeAttr(value) {
+            return escapeHtml(value).replace(/`/g, '&#96;');
+        }
+
+        modelTabs.forEach(tab => tab.addEventListener('click', () => {
+            activeModelTab = tab.dataset.model;
+            renderModelConfig();
+            updateFooterTarget();
+        }));
+
+        terminalTabs.forEach(tab => tab.addEventListener('click', () => {
+            activeLogTab = tab.dataset.log;
+            renderTerminal();
+        }));
+
+        [sarcasmSlider, honestySlider, humorSlider].forEach(slider => {
+            slider.addEventListener('input', () => { updateSlidersUI(); saveConfig(); });
+        });
+
+        contextSelect.addEventListener('change', saveConfig);
+        terminalToggleBtn.addEventListener('click', () => { terminalPanel.classList.toggle('hidden'); renderTerminal(); });
+        terminalCloseBtn.addEventListener('click', () => terminalPanel.classList.add('hidden'));
+
+        function syncTurns(value) {
+            loopState.maxTurns = Math.max(1, Math.min(50, parseInt(value || '10', 10)));
+            updateLoopUI();
+        }
+
+        function syncDelay(value) {
+            loopState.turnDelay = Math.max(500, Math.min(5000, parseInt(value || '1000', 10)));
+            updateLoopUI();
+        }
+
+        maxTurnsInput.addEventListener('input', () => syncTurns(maxTurnsInput.value));
+        sidebarMaxTurnsInput.addEventListener('input', () => syncTurns(sidebarMaxTurnsInput.value));
+        delaySlider.addEventListener('input', () => syncDelay(delaySlider.value));
+        sidebarDelaySlider.addEventListener('input', () => syncDelay(sidebarDelaySlider.value));
+        costCapInput.addEventListener('input', () => { costCap = Math.max(0, parseFloat(costCapInput.value || '0')); saveConfig(); renderTerminal(); });
+
+        btnStart.addEventListener('click', () => {
+            if (loopState.running && loopState.paused) {
+                resumeLoop();
+                return;
+            }
+            const seed = messageInput.value.trim();
+            messageInput.value = '';
+            startAdversarialLoop(seed);
+        });
+
+        btnPause.addEventListener('click', () => {
+            if (!loopState.running) return;
+            if (loopState.paused) resumeLoop();
+            else {
+                loopState.paused = true;
+                loopState.stopReason = 'Paused';
+                updateLoopUI();
+            }
+        });
+
+        btnStop.addEventListener('click', () => stopLoop('Stopped', true));
+
+        btnRetry.addEventListener('click', () => {
+            if (!lastRetry || loopState.running) return;
+            const retry = lastRetry;
+            lastRetry = null;
+            btnRetry.disabled = true;
+            if (retry.type === 'manual') {
+                sendToModel(retry.modelId, retry.query);
+            } else if (retry.type === 'loop') {
+                startAdversarialLoop('');
+            }
+        });
+
+        const clearContextBtn = document.getElementById('clearContextBtn');
+        if (clearContextBtn) {
+            clearContextBtn.addEventListener('click', () => {
+                conversationHistory = { A: [], B: [] };
+                chatHistory = [];
+                totalCost = 0.0;
+                contextTokenCount = 0;
+                tokenUsage.A = { prompt: 0, completion: 0, cost: 0 };
+                tokenUsage.B = { prompt: 0, completion: 0, cost: 0 };
+                chatArea.innerHTML = '';
+                updateStats();
+                renderTerminal();
+                costStat.innerText = '$0.00000';
+                contextStat.innerText = '0 tokens';
+                appendMessage('assistant', 'Context cleared. Both model histories reset.', '', {});
+            });
+        }
+
+        messageInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+            }
+        });
+        sendBtn.addEventListener('click', handleSend);
+        window.addEventListener('DOMContentLoaded', loadSavedConfig);
+
+        /*
+        Legacy single-model implementation retained below for reference and backward-compatibility keys.
+        let chatHistory = [];
+        let totalCost = 0.0;
+        let contextTokenCount = 0;
+
+        // UI elements
+        const modeSelect = document.getElementById('modeSelect');
+        const apiKeyInput = document.getElementById('apiKeyInput');
+        const baseUrlInput = document.getElementById('baseUrlInput');
+        const modelSelect = document.getElementById('modelSelect');
+        const keyGroup = document.getElementById('keyGroup');
+        const urlGroup = document.getElementById('urlGroup');
+        
+        const sarcasmSlider = document.getElementById('sarcasmSlider');
+        const honestySlider = document.getElementById('honestySlider');
+        const humorSlider = document.getElementById('humorSlider');
+        const sarcasmValue = document.getElementById('sarcasmValue');
+        const honestyValue = document.getElementById('honestyValue');
+        const humorValue = document.getElementById('humorValue');
+
+        const contextSelect = document.getElementById('contextSelect');
+
+        const statusDot = document.getElementById('statusDot');
+        const statusText = document.getElementById('statusText');
+        const latencyStat = document.getElementById('latencyStat');
+        const costStat = document.getElementById('costStat');
+        const contextStat = document.getElementById('contextStat');
+
+        const chatArea = document.getElementById('chatArea');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+
+        const footerTarget = document.getElementById('footerTarget');
+        const footerSarcasm = document.getElementById('footerSarcasm');
+        const footerHonesty = document.getElementById('footerHonesty');
+
+        const terminalPanel = document.getElementById('terminalPanel');
+        const terminalContent = document.getElementById('terminalContent');
+        const terminalToggleBtn = document.getElementById('terminalToggleBtn');
+        const terminalCloseBtn = document.getElementById('terminalCloseBtn');
+
+        // Load cached credentials from localStorage
+        function loadSavedConfig() {
+            modeSelect.value = localStorage.getItem('drift_mode') || 'simulate';
+            baseUrlInput.value = localStorage.getItem('drift_base_url') || 'http://localhost:1234/v1';
+            
+            sarcasmSlider.value = localStorage.getItem('drift_sarcasm') || 65;
+            honestySlider.value = localStorage.getItem('drift_honesty') || 95;
+            humorSlider.value = localStorage.getItem('drift_humor') || 60;
+            
+            updateSlidersUI();
+            updateModeUI();
+            
+            // Populate key field from localStorage or fallback to statically embedded keys
+            const activeMode = modeSelect.value;
+            let loadedKey = localStorage.getItem('drift_key_' + activeMode);
+            if (!loadedKey && STATIC_KEYS[activeMode] && !STATIC_KEYS[activeMode].includes('PLACEHOLDER')) {
+                loadedKey = STATIC_KEYS[activeMode];
+            }
+            apiKeyInput.value = loadedKey || '';
+        }
+
+        // Save credential config dynamically
+        function saveConfig() {
+            const activeMode = modeSelect.value;
+            localStorage.setItem('drift_mode', activeMode);
+            localStorage.setItem('drift_base_url', baseUrlInput.value);
+            localStorage.setItem('drift_key_' + activeMode, apiKeyInput.value);
+            
+            localStorage.setItem('drift_sarcasm', sarcasmSlider.value);
+            localStorage.setItem('drift_honesty', honestySlider.value);
+            localStorage.setItem('drift_humor', humorSlider.value);
+        }
+
+        // Toggle visibility based on selected provider mode
+        function updateModeUI() {
+            const mode = modeSelect.value;
+            
+            if (mode === 'simulate') {
+                keyGroup.style.display = 'none';
+                urlGroup.style.display = 'none';
+                statusDot.className = 'status-dot simulating';
+                statusText.innerText = 'System: Local Simulation Active';
+            } else if (mode === 'opencode-go' || mode === 'openrouter' || mode === 'gemini') {
+                keyGroup.style.display = 'flex';
+                urlGroup.style.display = 'none';
+                statusDot.className = 'status-dot';
+                statusText.innerText = `System: ${mode.toUpperCase()} Endpoint Active`;
+            } else if (mode === 'lmstudio') {
+                keyGroup.style.display = 'none';
+                urlGroup.style.display = 'flex';
+                statusDot.className = 'status-dot';
+                statusText.innerText = 'System: LM Studio Connection Ready';
+            }
+
+            // Load key specific to this mode
+            let loadedKey = localStorage.getItem('drift_key_' + mode);
+            if (!loadedKey && STATIC_KEYS[mode] && !STATIC_KEYS[mode].includes('PLACEHOLDER')) {
+                loadedKey = STATIC_KEYS[mode];
+            }
+            apiKeyInput.value = loadedKey || '';
+
+            // Populate models
+            modelSelect.innerHTML = '';
+            const models = PROVIDER_MODELS[mode] || [];
+            models.forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m;
+                opt.innerText = m;
+                modelSelect.appendChild(opt);
+            });
+            
+            updateFooterTarget();
+        }
+
+        function updateSlidersUI() {
+            sarcasmValue.innerText = sarcasmSlider.value + '%';
+            honestyValue.innerText = honestySlider.value + '%';
+            humorValue.innerText = humorSlider.value + '%';
+
+            footerSarcasm.innerText = sarcasmSlider.value + '%';
+            footerHonesty.innerText = honestySlider.value + '%';
+        }
+
+        function updateFooterTarget() {
+            footerTarget.innerText = `${modelSelect.value || 'None'} (${modeSelect.value})`;
+        }
+
+        // Event listeners for sliders/selectors
+        modeSelect.addEventListener('change', () => { updateModeUI(); saveConfig(); });
+        modelSelect.addEventListener('change', () => { updateFooterTarget(); });
+        
+        [sarcasmSlider, honestySlider, humorSlider].forEach(slider => {
+            slider.addEventListener('input', () => {
+                updateSlidersUI();
+                saveConfig();
+            });
+        });
+
+        apiKeyInput.addEventListener('input', saveConfig);
+        baseUrlInput.addEventListener('input', saveConfig);
+
+        // Terminal Log Toggle
+        terminalToggleBtn.addEventListener('click', () => {
+            terminalPanel.classList.toggle('hidden');
+        });
+        terminalCloseBtn.addEventListener('click', () => {
+            terminalPanel.classList.add('hidden');
+        });
+
+        // Add a log entry into our Developer HUD Terminal
+        function logToTerminal(title, obj) {
+            terminalPanel.classList.remove('hidden');
+            const dateStr = new Date().toISOString().split('T')[1].slice(0, 8);
+            
+            let jsonString = '';
+            try {
+                jsonString = typeof obj === 'string' ? obj : JSON.stringify(obj, null, 2);
+            } catch(e) {
+                jsonString = String(obj);
+            }
+
+            terminalContent.innerHTML = `[${dateStr}] // ${title.toUpperCase()}\n----------------------------------------\n${jsonString}`;
+            terminalContent.scrollTop = 0;
+        }
+
+        // Render message to the chat container
+        function appendMessage(role, text, thinkingText = '') {
+            const row = document.createElement('div');
+            row.className = `message-row ${role === 'user' ? 'user' : 'assistant'}`;
+
+            const avatar = document.createElement('div');
+            avatar.className = 'avatar-box';
+            avatar.innerText = role === 'user' ? 'M' : 'T';
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'bubble-wrapper';
+
+            const sender = document.createElement('div');
+            sender.className = 'bubble-sender';
+            sender.innerText = role === 'user' ? 'Mike' : 'TARS';
+
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble-body';
+
+            // If there's an active thinking block, construct the custom accordion
+            if (role === 'assistant' && thinkingText) {
+                const thinkContainer = document.createElement('div');
+                thinkContainer.className = 'thinking-container collapsed';
+                
+                const thinkHeader = document.createElement('div');
+                thinkHeader.className = 'thinking-header';
+                thinkHeader.innerHTML = `<span>⚡ Thought Signature (thinking block)</span><span class="chevron">▼</span>`;
+                
+                const thinkContent = document.createElement('div');
+                thinkContent.className = 'thinking-content';
+                thinkContent.innerText = thinkingText;
+                
+                thinkHeader.addEventListener('click', () => {
+                    thinkContainer.classList.toggle('collapsed');
+                    thinkHeader.querySelector('.chevron').innerText = thinkContainer.classList.contains('collapsed') ? '▼' : '▲';
+                });
+                
+                thinkContainer.appendChild(thinkHeader);
+                thinkContainer.appendChild(thinkContent);
+                wrapper.appendChild(thinkContainer);
+            }
+
+            // Client side markdown rendering via marked
+            if (typeof marked !== 'undefined') {
+                bubble.innerHTML = marked.parse(text);
+            } else {
+                bubble.innerText = text;
+            }
+
+            wrapper.appendChild(sender);
+            wrapper.appendChild(bubble);
+            row.appendChild(avatar);
+            row.appendChild(wrapper);
+            
+            chatArea.appendChild(row);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        // Interactive Send Logic
+        async function handleSend() {
+            const query = messageInput.value.trim();
+            if (!query) return;
+
+            messageInput.value = '';
+            
+            // Increment context tokens mock count
+            const promptTokens = Math.floor(query.split(' ').length * 1.35) + 12;
+            contextTokenCount += promptTokens;
+            contextStat.innerText = contextTokenCount + ' tokens';
+
+            // Load selected file context if any
+            let fileContext = '';
+            if (contextSelect.value) {
+                fileContext = `\n\n[INJECTED CONTEXT: ${contextSelect.value}]\n${CONTEXTS[contextSelect.value]}`;
+            }
+
+            appendMessage('user', query);
+
+            const activeMode = modeSelect.value;
+            const activeModel = modelSelect.value;
+
+            // Log output to terminal
+            logToTerminal("packet inbound", {
+                model: activeModel,
+                mode: activeMode,
+                query: query,
+                context_file: contextSelect.value || "none",
+                personality: {
+                    sarcasm: sarcasmSlider.value + "%",
+                    honesty: honestySlider.value + "%",
+                    humor: humorSlider.value + "%"
+                }
+            });
+
+            if (activeMode === 'simulate') {
+                simulateResponse(query);
+                return;
+            }
+
+            // Real API endpoints
+            try {
+                statusDot.className = 'status-dot';
+                statusDot.style.backgroundColor = 'var(--accent-primary)';
+                statusDot.style.boxShadow = '0 0 10px var(--accent-primary)';
+                statusText.innerText = 'System: Handshaking with API...';
+
+                const start = Date.now();
+                let endpoint = '';
+                let headers = { "Content-Type": "application/json" };
+                let body = {};
+
+                const systemPrompt = `You are TARS. Sarcasm Setting: ${sarcasmSlider.value}%, Honesty: ${honestySlider.value}%, Humor: ${humorSlider.value}%. Be concise, direct, and slightly sarcastic.`;
+
+                if (activeMode === 'openrouter') {
+                    endpoint = 'https://openrouter.ai/api/v1/chat/completions';
+                    headers["Authorization"] = `Bearer ${apiKeyInput.value}`;
+                    body = {
+                        model: activeModel,
+                        messages: [
+                            { role: 'system', content: systemPrompt },
+                            { role: 'user', content: query + fileContext }
+                        ]
+                    };
+                } else if (activeMode === 'opencode-go') {
+                    endpoint = `${OPENCODE_GO_PROXY_BASE_URL}/chat/completions`;
+                    headers["Authorization"] = `Bearer ${apiKeyInput.value}`;
+                    headers["x-drift-upstream-base"] = OPENCODE_GO_UPSTREAM_BASE_URL;
+                    body = {
+                        model: activeModel,
+                        messages: [
+                            { role: 'system', content: systemPrompt },
+                            { role: 'user', content: query + fileContext }
+                        ]
+                    };
+                } else if (activeMode === 'lmstudio') {
+                    endpoint = `${baseUrlInput.value.replace(/\/$/, '')}/chat/completions`;
+                    body = {
+                        model: activeModel,
+                        messages: [
+                            { role: 'system', content: systemPrompt },
+                            { role: 'user', content: query + fileContext }
+                        ]
+                    };
+                } else if (activeMode === 'gemini') {
+                    // Google AI Studio native payload
+                    endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${activeModel}:generateContent?key=${apiKeyInput.value}`;
+                    body = {
+                        contents: [{
+                            parts: [{ text: `${systemPrompt}\n\nUser message: ${query + fileContext}` }]
+                        }]
+                    };
+                }
+
+                // Log JSON to terminal
+                logToTerminal("http post request", body);
+
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(body)
+                });
+
+                const end = Date.now();
+                const latency = end - start;
+                latencyStat.innerText = `${latency}ms`;
+
+                if (!response.ok) {
+                    const errText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errText}`);
+                }
+
+                const payload = await response.json();
+                logToTerminal("http raw response", payload);
+
+                let reply = '';
+                let thoughts = '';
+
+                if (activeMode === 'gemini') {
+                    const candidate = payload.candidates?.[0];
+                    reply = candidate?.content?.parts?.[0]?.text || 'No response text';
+                    thoughts = candidate?.content?.parts?.[0]?.thoughtSignature || '';
+                } else {
+                    // OpenAI format
+                    reply = payload.choices?.[0]?.message?.content || 'No choices text';
+                }
+
+                // Increment cost
+                const completionTokens = Math.floor(reply.split(' ').length * 1.35);
+                const queryCost = calculateCost(activeModel, promptTokens, completionTokens);
+                totalCost += queryCost;
+                costStat.innerText = `$${totalCost.toFixed(5)}`;
+
+                statusDot.className = 'status-dot';
+                statusDot.removeAttribute('style');
+                statusText.innerText = `System: Done in ${latency}ms`;
+
+                appendMessage('assistant', reply, thoughts);
+
+            } catch (e) {
+                statusDot.className = 'status-dot';
+                statusDot.style.backgroundColor = 'var(--accent-warning)';
+                statusDot.style.boxShadow = '0 0 10px var(--accent-warning)';
+                statusText.innerText = 'System: Connection Error';
+                
+                logToTerminal("api failure log", e.message);
+                appendMessage('assistant', `**CONNECTION FAILURE:** ${e.message}. Adjust your base URL, make sure LM Studio is running on the correct port, or verify your API keys.`);
+            }
+        }
+
+        // Simulated Response pipeline for instant offline playground
+        function simulateResponse(query) {
+            statusDot.className = 'status-dot simulating';
+            statusText.innerText = 'System: Simulating thinking cycle...';
+            latencyStat.innerText = 'Probing...';
+
+            setTimeout(() => {
+                const start = Date.now();
+                
+                // Select random template response, customize with sliders
+                let responseTemplate = MOCK_ANSWERS[Math.floor(Math.random() * MOCK_ANSWERS.length)];
+                let reply = responseTemplate
+                    .replace('{sarcasm}', sarcasmSlider.value)
+                    .replace('{honesty}', honestySlider.value)
+                    .replace('{humor}', humorSlider.value)
+                    .replace('{cost}', `$${(promptTokensCost(messageInput.value) * 100).toFixed(4)}`);
+
+                const completionTokens = Math.floor(reply.split(' ').length * 1.35);
+                const cost = calculateCost("deepseek-v4-flash", 15, completionTokens);
+                totalCost += cost;
+
+                // Simulate deep thinking
+                const thoughts = `Recalculating humor ratios...\nMatching user input keywords: "${query.slice(0, 15)}..."\nApplying design standards: background=#08080a, accent=#22d3ee.\nEvaluating potential output sarcasm threshold... Success.`;
+
+                // Log mock data to developer HUD
+                logToTerminal("simulated stream response", {
+                    model: modelSelect.value,
+                    usage: {
+                        prompt_tokens: 15,
+                        completion_tokens: completionTokens,
+                        total_tokens: 15 + completionTokens
+                    },
+                    simulated_thoughts: thoughts,
+                    output_text: reply
+                });
+
+                const latency = Date.now() - start + 450; // add mock overhead
+                latencyStat.innerText = `${latency}ms`;
+                costStat.innerText = `$${totalCost.toFixed(5)}`;
+
+                statusDot.className = 'status-dot simulating';
+                statusText.innerText = 'System: Simulation Idle';
+
+                appendMessage('assistant', reply, thoughts);
+            }, 600);
+        }
+
+        function promptTokensCost(text) {
+            return (text.split(' ').length * 1.35) * 0.00000007; // simulated pricing
+        }
+
+        function calculateCost(model, prompt, completion) {
+            // pricing rules per 1M tokens as of May 2026
+            let p_rate = 0.07; // $0.07/1M
+            let c_rate = 0.07; // $0.07/1M
+            
+            if (model.includes("claude-sonnet")) {
+                p_rate = 3.00;
+                c_rate = 15.00;
+            } else if (model.includes("pro")) {
+                p_rate = 1.25;
+                c_rate = 5.00;
+            }
+
+            return ((prompt * p_rate) + (completion * c_rate)) / 1000000;
+        }
+
+        // Key bindings
+        messageInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+            }
+        });
+
+        sendBtn.addEventListener('click', handleSend);
+
+        // Bootstrap
+        window.addEventListener('DOMContentLoaded', () => {
+            loadSavedConfig();
+        });
+        */
+    </script>
+</body>
+</html>
