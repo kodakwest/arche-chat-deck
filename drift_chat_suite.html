@@ -20,7 +20,7 @@
             /* Typography */
             --ink: #f2f0e8;
             --ink-secondary: #a8a6a0;
-            --ink-muted: #6b6a66;
+            --ink-muted: #807e7a;
 
             /* Domain Accent (Default: Cyber Teal) */
             --accent-primary: #22d3ee;
@@ -37,6 +37,39 @@
 
             --font-sans: 'Inter', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
+
+            /* Interaction States */
+            --state-hover: rgba(255, 255, 255, 0.06);
+            --state-active: rgba(255, 255, 255, 0.10);
+            --state-focus: 2px solid var(--accent-primary);
+            --state-focus-offset: 3px;
+            --state-disabled-bg: rgba(255, 255, 255, 0.03);
+        }
+
+        /* Light Mode */
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg-deep: #f2f0e8;
+                --bg-base: #f2f0e8;
+                --bg-alt: #e8e6de;
+                --panel: #e8e6de;
+                --surface: #dddcd4;
+                --border-panel: rgba(0, 0, 0, 0.10);
+                --ink: #1a1a1a;
+                --ink-secondary: #4a4a4a;
+                --ink-muted: #636363;
+                --state-hover: rgba(0, 0, 0, 0.04);
+                --state-active: rgba(0, 0, 0, 0.08);
+            }
+        }
+
+        /* High Contrast Mode */
+        @media (prefers-contrast: more) {
+            :root {
+                --border-panel: 1px solid var(--ink-secondary);
+                --state-focus: 3px solid var(--ink);
+                --state-focus-offset: 4px;
+            }
         }
 
         * {
