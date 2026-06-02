@@ -1,8 +1,8 @@
-# AGENTS.md — AgentFlow AI Chat Deck
+# AGENTS.md — Arche Chat Deck (formerly AgentFlow AI Chat Deck)
 
 ## Project Context
 
-This is a premium bolt-on module for AgentFlow — a dual-model adversarial AI conversation deck. Single HTML file + optional Node.js relay server. Dark-themed, local-first, multi-provider.
+This is a premium bolt-on module for the Arche ecosystem — a dual-model adversarial AI conversation deck. Single HTML file + optional Node.js relay server. Dark-themed, local-first, multi-provider. Repo: `kodakwest/arche-chat-deck`.
 
 ## Visual Conventions
 
