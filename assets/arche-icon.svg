@@ -1,19 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Arche — Gateway Icon (Master Brand)
-     Architectural arch + routed execution line + origin node.
-     Monochrome-first. Works at 16px. -->
+<!-- Arche — Gateway Icon (Master Brand Mark)
+     Architectural arch forming an 'A', routed execution beam, origin + active node.
+     Monochrome-safe. Works at 16px–256px. -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
-  <!-- Gateway arch — two pillars, angled top forming an 'A'-arch -->
-  <path d="M4 22 L4 12 C4 4 20 4 20 12 L20 22"
+  <!-- Gateway arch — two pillars with curved top, forming an 'A' shape -->
+  <path d="M3.5 22 L3.5 10 C3.5 3 20.5 3 20.5 10 L20.5 22"
         stroke="#22d3ee" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
-  
-  <!-- Routed execution beam — work flows through the gateway -->
-  <path d="M4 15 L20 15" stroke="#22d3ee" stroke-width="1.5" stroke-linecap="round"/>
-  
-  <!-- Active flow node — current execution point -->
-  <circle cx="12" cy="15" r="3" fill="none" stroke="#22d3ee" stroke-width="0.75" opacity="0.35"/>
-  <circle cx="12" cy="15" r="1.5" fill="#22d3ee"/>
-  
+  <!-- Horizontal routed beam — work flows through the gateway -->
+  <path d="M3.5 14 L20.5 14" stroke="#22d3ee" stroke-width="1.5" stroke-linecap="round"/>
   <!-- Origin point — first principle, where execution begins -->
-  <circle cx="12" cy="3" r="1.5" fill="#22d3ee"/>
+  <circle cx="12" cy="3.5" r="1.5" fill="#22d3ee"/>
+  <!-- Active execution node — current flow position -->
+  <circle cx="12" cy="14" r="3" fill="none" stroke="#22d3ee" stroke-width="0.75" opacity="0.3"/>
+  <circle cx="12" cy="14" r="1.5" fill="#22d3ee"/>
 </svg>

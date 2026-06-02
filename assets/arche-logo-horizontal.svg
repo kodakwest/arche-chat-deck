@@ -1,24 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Arche — Horizontal Lockup (Master Brand)
-     Icon + wordmark. Use for website header, docs, social avatars. -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 32" fill="none">
-  <!-- Icon -->
-  <g transform="translate(4, 4)">
-    <path d="M4 24 L4 12 C4 4 20 4 20 12 L20 24"
+<!-- Arche — Horizontal Lockup (Master Brand) -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 36" fill="none">
+  <g transform="translate(6, 6)">
+    <path d="M3.5 24 L3.5 10 C3.5 3 20.5 3 20.5 10 L20.5 24"
           stroke="#22d3ee" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
-    <path d="M4 16 L20 16" stroke="#22d3ee" stroke-width="1.5" stroke-linecap="round"/>
-    <circle cx="12" cy="16" r="3" fill="none" stroke="#22d3ee" stroke-width="0.75" opacity="0.35"/>
-    <circle cx="12" cy="16" r="1.5" fill="#22d3ee"/>
-    <circle cx="12" cy="3" r="1.5" fill="#22d3ee"/>
+    <path d="M3.5 14 L20.5 14" stroke="#22d3ee" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="12" cy="3.5" r="1.5" fill="#22d3ee"/>
+    <circle cx="12" cy="14" r="3" fill="none" stroke="#22d3ee" stroke-width="0.75" opacity="0.3"/>
+    <circle cx="12" cy="14" r="1.5" fill="#22d3ee"/>
   </g>
-
-  <!-- Wordmark -->
-  <text x="36" y="24" font-family="'Inter', 'SF Pro Display', system-ui, sans-serif"
-        font-size="20" font-weight="600" letter-spacing="0.08em"
+  <text x="40" y="24" font-family="'Inter', 'SF Pro Display', system-ui, sans-serif"
+        font-size="22" font-weight="600" letter-spacing="0.08em"
         fill="#f2f0e8" dominant-baseline="bottom">ARCHE</text>
-
-  <!-- Tagline -->
-  <text x="36" y="30" font-family="'Inter', 'SF Pro Display', system-ui, sans-serif"
-        font-size="6" font-weight="400" letter-spacing="0.15em"
+  <text x="40" y="31" font-family="'Inter', 'SF Pro Display', system-ui, sans-serif"
+        font-size="6.5" font-weight="400" letter-spacing="0.15em"
         fill="#6b7280" dominant-baseline="bottom">BUILD SECURE AGENT WORKFLOWS</text>
 </svg>
