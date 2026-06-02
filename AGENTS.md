@@ -108,7 +108,7 @@ When adding new tokens, prefer semantic names (what it does) over material names
 
 ## Feature Intent
 
-This deck is a premium AgentFlow feature. The differentiator is the dual-model adversarial loop — two independently configured AI models conversing automatically with user injection controls and token tracking. Competitors (Perplexity Counsel, ChatGPT Canvas, Claude Artifacts) don't offer this.
+This deck is a premium Arche feature. The differentiator is the dual-model adversarial loop — two independently configured AI models conversing automatically with user injection controls and token tracking. Competitors (Perplexity Counsel, ChatGPT Canvas, Claude Artifacts) don't offer this.
 
 ## Design Principles
 

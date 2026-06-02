@@ -1,6 +1,6 @@
-# AgentFlow AI Chat Deck
+# Arche Chat Deck (formerly AgentFlow AI Chat Deck)
 
-Dual-model adversarial conversation engine — two independently configured AI models conversing automatically with user injection controls, token tracking, and real-time activity indicators.
+Dual-model adversarial conversation engine for the Arche ecosystem — two independently configured AI models conversing automatically with user injection controls, token tracking, and real-time activity indicators.
 
 ## Features
 
@@ -19,8 +19,8 @@ Dual-model adversarial conversation engine — two independently configured AI m
 ## Architecture
 
 ```
-app.agentflow.com/drift*  → CF Pages (HTML artifact)
-drift-api.agentflow.com   → CF Worker (CORS relay → OpenCode Go)
+arche.agentarche.ai/drift*  → CF Pages (HTML artifact)
+drift-api.arche.agentarche.ai   → CF Worker (CORS relay → OpenCode Go)
 ```
 
 **Local development:**
@@ -48,7 +48,7 @@ drift-api.agentflow.com   → CF Worker (CORS relay → OpenCode Go)
 ## Project Structure
 
 ```
-agentflow-ai-chat-deck/
+arche-chat-deck/
 ├── drift_chat_suite.html          # Main application (single file)
 ├── relay-server.js                # Local CORS relay (Node.js)
 ├── workers/
@@ -72,7 +72,7 @@ Dark theme with glassmorphism. Model A in teal (`#22d3ee`), Model B in violet (`
 cd workers && wrangler deploy
 
 # Deploy Pages app
-wrangler pages deploy . --project-name agentflow-ai-chat-deck
+wrangler pages deploy . --project-name arche-chat-deck
 ```
 
 ## License
