@@ -122,10 +122,11 @@ This deck is a premium Arche feature. The differentiator is the dual-model adver
 Every deploy MUST pass this sequence before merge:
 
 1. Code changes (Codex/Jules PR)
-2. Jules generates unit + E2E tests for the change surface
-3. All tests pass (`npm test && npm run test:e2e`)
-4. UAT dashboard (`docs/uat-brand-dashboard.html`) verified against the deploy target
-5. Brand compliance scan: zero stale AgentFlow references in code (historical breadcrumbs in docs are acceptable)
-6. Merge → deploy
+2. **Prompt changes are code changes** — any change to worker prompts, agent instructions, orchestration prompts, or package-generation prompts must include: diff review, prompt behavior rationale, Jules test generation/update
+3. Jules generates unit + E2E tests for the change surface
+4. All tests pass (`npm test && npm run test:e2e`)
+5. UAT dashboard (`docs/uat-brand-dashboard.html`) verified against the deploy target
+6. Brand compliance scan: zero stale AgentFlow references in code (historical breadcrumbs in docs are acceptable)
+7. Merge → deploy
 
-**Gate keeper:** Jules runs tests. TARS verifies UAT. No deploy without both green. Tests are not optional. UAT is not optional.
+**Gate keeper:** Jules runs tests. TARS verifies UAT. No deploy without both green. Tests are not optional. UAT is not optional. Prompts are not copy — they are runtime behavior.
