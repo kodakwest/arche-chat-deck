@@ -116,3 +116,16 @@ This deck is a premium Arche feature. The differentiator is the dual-model adver
 - **Dual-source clarity** — Model A (teal) and Model B (violet) are visually distinct at a glance
 - **Controls over automation** — Start/Pause/Stop/Retry always accessible, never trapped in menus
 - **Debug transparency** — raw API payloads, token flow, latency shown in terminal, not hidden behind settings
+
+## Deployment Gate
+
+Every deploy MUST pass this sequence before merge:
+
+1. Code changes (Codex/Jules PR)
+2. Jules generates unit + E2E tests for the change surface
+3. All tests pass (`npm test && npm run test:e2e`)
+4. UAT dashboard (`docs/uat-brand-dashboard.html`) verified against the deploy target
+5. Brand compliance scan: zero stale AgentFlow references in code (historical breadcrumbs in docs are acceptable)
+6. Merge → deploy
+
+**Gate keeper:** Jules runs tests. TARS verifies UAT. No deploy without both green. Tests are not optional. UAT is not optional.
