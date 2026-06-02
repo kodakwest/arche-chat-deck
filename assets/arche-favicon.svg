@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Arche — Logo Favicon (16px optimized)
+     Monochrome, no transparency tricks. For favicon.ico / browser tab. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none">
+  <path d="M3 14 L3 8 C3 2 13 2 13 8 L13 14"
+        stroke="#22d3ee" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M3 10 L13 10" stroke="#22d3ee" stroke-width="1.2" stroke-linecap="round"/>
+  <circle cx="8" cy="10" r="1" fill="#22d3ee"/>
+  <circle cx="8" cy="2.5" r="1" fill="#22d3ee"/>
+</svg>
